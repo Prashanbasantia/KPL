@@ -1,0 +1,48 @@
+{% extends 'Index_App/base.html' %} {% load static %} {% block main_content %}
+<section class="our-services" id="services">
+  <div class="container mb-3">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card" style="background-color: #f7f7f7;box-shadow: 1px 2px 3px 1px #b1abab;">
+			<div class="card-header">
+				<h6 class="card-title text-primary">Players</h6>
+			</div>
+		  <div class="card-body">
+        <table class="table table-hover table-bordered table-sm" id="sampleTable">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Team</th>
+              <th>Role</th>
+              <th>Age</th>
+              <th>Village</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in all_players %}
+            <tr>
+              <td><img src="{{p.image.url}}" class="rounded-circle border-border-success" width="30px" height="30px" alt="{{p.name}}"> </td>
+              <td><a href="{% url 'player_details' id=p.id %}">{{p.name}}</a></td>
+              <td><a href="{% url 'team_details' id=p.team.id %}">{{p.team.name}}</a></td>
+              <td>{{p.role}}</td>
+              <td>{{p.age}}</td>
+              <td>{{p.address}}</td>
+            </tr>
+            {% endfor%}
+            
+             
+          </tbody>
+        </table>
+		  </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock main_content %}
+{% block js %}
+
+{% endblock js %}

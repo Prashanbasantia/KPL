@@ -1,0 +1,84 @@
+{% extends 'Index_App/base.html' %}
+{% load static %}
+
+{% block main_content %}
+	
+<section id="home" class="home">
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="main-banner">
+					<div class="d-sm-flex justify-content-between">
+						<div data-aos="zoom-in-up">
+							<div class="d-flex justify-content-between">
+									<div>
+										<img src="{{matchinfo.first_ins.logo.url}}" alt="marsmello" class=" img-thumbnail" width="150px" height="50px" data-aos="zoom-in-up">
+										<p class="">
+											{{matchinfo.first_ins.short_name}} <span id="teamone">{{matchinfo.first_ins_runs}}/{{matchinfo.first_ins_wkts}} ({{matchinfo.first_ins_overs}})</span>
+										</p>
+									</div>
+									<div>
+										<center><h1 class="mt-4 px-2">VS</h1></center>
+									</div>
+									<div class="">
+										<img src="{{matchinfo.second_ins.logo.url}}" alt="marsmello" class="img-thumbnail" width="150px" height="50px" data-aos="zoom-in-up">
+										<p class="">
+											{{matchinfo.second_ins.short_name}} <span id="teamtwo">{% if matchinfo.first_ins_complete%}{{matchinfo.second_ins_runs}}/{{matchinfo.second_ins_wkts}} ({{matchinfo.second_ins_overs}}) {%endif %}</span>
+										</p>
+									</div>
+							</div>
+							<a href="#" class="btn btn-danger mt-3">Live</a>
+						</div>
+						
+						<div class="mt-5 mt-lg-0">
+							<img src="{% static 'Index_App/images/group.png' %}" alt="marsmello" class="img-fluid" data-aos="zoom-in-up">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock main_content %}
+
+{% block js %}
+<script>
+var BASEURL="http://127.0.0.1:8008"
+
+  $(document).ready(function(){
+		setInterval(function(){
+			$.ajax({
+				url: "fetch_user_livematch_home",
+				type: "GET",
+				data: {
+				  "match_info": "{{matchinfo.id}}"
+				},
+				cache: false,
+				success: function(result){
+				  if(result["status"]){
+					  console.log("hii")
+					var matchinfo = result["matchinfo"]
+					if (matchinfo.first_ins_complete){
+					  $('#teamtwo').empty()
+					  $('#teamtwo').text(`${matchinfo.second_ins_runs}/${matchinfo.second_ins_wkts} (${matchinfo.second_ins_overs})`)
+				  }
+				  else{
+					  $('#teamone').empty()
+					  $('#teamone').text(`${matchinfo.first_ins_runs}/${matchinfo.first_ins_wkts} (${matchinfo.first_ins_overs})`)
+				  }
+  
+				}
+				else{
+				  console.log(result["message"])
+				}
+			  },error:function(e){
+  
+			  }
+	
+			});
+		},500)
+         
+      
+  });
+</script>	
+{% endblock js %}

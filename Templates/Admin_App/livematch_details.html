@@ -1,0 +1,721 @@
+{% extends 'Admin_App/base.html' %}
+
+{% load static %}
+{% block main_content %}
+
+<main class="app-content">
+  <div class="app-title">
+    <div>
+      <ul class="app-breadcrumb breadcrumb">
+        <li class="breadcrumb-item active"><a href="{{players}}"><i class="fa fa-dashboard"></i> Players</a></li>
+      </ul>
+    </div>
+    <ul class="app-breadcrumb breadcrumb">
+      <li class="breadcrumb-item active">
+
+      </li>
+      </li>
+    </ul>
+
+      <div class="modal" id="loader_modal">
+        <div class="modal-dialog modal-sm modal-center" role="document">
+          <div class="modal-content">
+            <div class="spinner-grow text-secondary" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="row">
+          <!-- bat 1 -->
+          <div class="col-md-6">
+            <div class="tile" id="batone">
+
+            </div>
+          </div>
+          <!-- end bat 1 -->
+          <!-- bat 2 -->
+          <div class="col-md-6">
+            <div class="tile" id="battwo">
+
+            </div>
+          </div>
+          <!-- end bat 2 -->
+          <!-- bowl -->
+          <div class="col-md-12">
+            <div class="tile" id="bowl">
+
+            </div>
+          </div>
+          <!-- end blow -->
+        </div>
+
+      </div>
+
+      <!-- bowl -->
+      <div class="col-lg-6">
+        <div class="tile playing_squard">
+
+        </div>
+      </div>
+      <!-- endbowl -->
+    </div>
+</main>
+{% endblock main_content %}
+
+
+
+{% block js %}
+<script type="text/javascript">
+  var BASEURL = "http://127.0.0.1:8008"
+  ///// RUN COUNTER
+  function update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo) {
+    // ####### Bolrwe player
+
+    if (player.length == 1) {
+      var modal = ""
+      modal += '<div class="row">'
+      modal += '<div class="col-12 mb-2 border-bottom border-primary">'
+      modal += '<h6 class="">' + player[0]["name"] + ' '
+      if (score[0]["bat_is_striker"]) {
+        modal += '<sup class="text-danger"><i class="fa fa-star"></i></sup>'
+      }
+      modal += '<span class="ml-2"> (' + score[0]["bat_runs"] + '/' + score[0]["bat_balls"] + ')</span> </h6>'
+      modal += '</div>'
+      modal += '<div class="col-6">'
+      modal += '<img src="' + BASEURL + player[0]["image"] + '" class="img-thumbnail" alt="logo">'
+      modal += '</div>'
+      modal += '<div class="col-6">'
+      modal += '<span class="badge badge-secondary mr-2">SR</span> ' + score[0]["bat_strike_rate"] + '<br>'
+      modal += '<span class="badge badge-primary mr-2">4s</span> ' + score[0]["bat_fours"] + '<br>'
+      modal += '<span class="badge badge-danger mr-2">6s</span> ' + score[0]["bat_sixes"] + '<br>                '
+      modal += '</div>'
+      modal += '</div>'
+
+      $(".batone_head").remove()
+      $('#batone').empty()
+      $('#batone').append(modal)
+      var t2 = ""
+      t2 += '<div class="batone_head">'
+      t2 += '<h6 class="">Add Batsman  '
+      t2 += '<button class="float-right btn btn-outline-info btn-sm" type="button" id="Add_batter_two"><i class="fa fa-plus" aria-hidden="true"></i></button></h6>'
+      t2 += '</div>'
+      $('#battwo').empty()
+      $('#battwo').append(t2)
+    }
+    else if (player.length == 2) {
+      var modal = ""
+      modal += '<div class="row">'
+      modal += '<div class="col-12 mb-2 border-bottom border-primary">'
+      modal += '<h6 class="">' + player[0]["name"] + ' '
+      if (score[0]["bat_is_striker"]) {
+        modal += '<sup class="text-danger"><i class="fa fa-star"></i></sup>'
+      }
+      modal += '<span class="ml-2"> (' + score[0]["bat_runs"] + '/' + score[0]["bat_balls"] + ')</span> </h6>'
+      modal += '</div>'
+      modal += '<div class="col-6">'
+      modal += '<img src="' + BASEURL + player[0]["image"] + '" class="img-thumbnail" alt="logo">'
+      modal += '</div>'
+      modal += '<div class="col-6">'
+      modal += '<span class="badge badge-secondary mr-2">SR</span> ' + score[0]["bat_strike_rate"] + '<br>'
+      modal += '<span class="badge badge-primary mr-2">4s</span> ' + score[0]["bat_fours"] + '<br>'
+      modal += '<span class="badge badge-danger mr-2">6s</span> ' + score[0]["bat_sixes"] + '<br>                '
+      modal += '</div>'
+      modal += '</div>'
+
+      $(".batone_head").remove()
+      $('#batone').empty()
+      $('#batone').append(modal)
+
+      var modal2 = ""
+      modal2 += '<div class="row">'
+      modal2 += '<div class="col-12 mb-2 border-bottom border-primary">'
+      modal2 += '<h6 class="">' + player[1]["name"] + ' '
+      if (score[1]["bat_is_striker"]) {
+        modal2 += '<sup class="text-danger"><i class="fa fa-star"></i></sup>'
+      }
+      modal2 += '<span class="ml-2"> (' + score[1]["bat_runs"] + '/' + score[1]["bat_balls"] + ')</span> </h6>'
+      modal2 += '</div>'
+      modal2 += '<div class="col-6">'
+      modal2 += '<img src="' + BASEURL + player[1]["image"] + '" class="img-thumbnail" alt="logo">'
+      modal2 += '</div>'
+      modal2 += '<div class="col-6">'
+      modal2 += '<span class="badge badge-secondary mr-2">SR</span> ' + score[1]["bat_strike_rate"] + '<br>'
+      modal2 += '<span class="badge badge-primary mr-2">4s</span> ' + score[1]["bat_fours"] + '<br>'
+      modal2 += '<span class="badge badge-danger mr-2">6s</span> ' + score[1]["bat_sixes"] + '<br>                '
+      modal2 += '</div>'
+      modal2 += '</div>'
+
+      $(".battwo_head").remove()
+      $('#battwo').empty()
+      $('#battwo').append(modal2)
+    }
+    else {
+      var t1 = ""
+      t1 += '<div class="batone_head">'
+      t1 += '<h6 class="">Add Batsman  '
+      t1 += '<button class="float-right btn btn-outline-info btn-sm" type="button" id="Add_batter_one"><i class="fa fa-plus" aria-hidden="true"></i></button></h6>'
+      t1 += '</div>'
+      $('#batone').empty()
+      $('#batone').append(t1)
+
+      var t2 = ""
+      t2 += '<div class="batone_head">'
+      t2 += '<h6 class="">Add Batsman  '
+      t2 += '<button class="float-right btn btn-outline-info btn-sm" type="button" id="Add_batter_two"><i class="fa fa-plus" aria-hidden="true"></i></button></h6>'
+      t2 += '</div>'
+      $('#battwo').empty()
+      $('#battwo').append(t2)
+    }
+
+    // ####### Bolrwe player
+
+    if (player_bowl.length == 1) {
+
+      var modal = ""
+      modal += '<div class="row" >'
+      modal += '<div class="col-6">'
+      modal += '<div class="row">'
+      modal += '<div class="col-12 mb-2 border-bottom  border-primary">'
+      modal += '<h6 class="">' + player_bowl[0]["name"] + ''
+      modal += '<span class="ml-2"> (' + bowl_score[0]["bowl_over"] + '/' + bowl_score[0]["bowl_wicket"] + ')</span> </h6>'
+      modal += '</div>'
+      modal += '<div class="col-6">'
+      modal += '<img src="' + BASEURL + player_bowl[0]["image"] + '" class="img-thumbnail" alt="logo">'
+      modal += '</div>'
+      modal += '<div class="col-6">'
+      modal += '<span class="badge badge-secondary mr-2">Eco</span> ' + bowl_score[0]["bowl_economy"] + ' <br>'
+      modal += '<span class="badge badge-primary mr-2">Runs</span> ' + bowl_score[0]["bowl_runs"] + ' <br>'
+      modal += '</div>'
+      modal += '</div>'
+      modal += '</div>'
+
+      modal += '<div class="col-6  pr-2 border-left  border-primary">'
+      modal += '<div class="">'
+      modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="run0" value="0" >0</button> '
+      modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="run1" value="1" >1</button>  '
+      modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="run2" value="2" >2</button>  '
+      modal += '<button class="event_btn btn btn-outline-secondary btn-sm ml-2" id="run3" value="3" >3</button>'
+      modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="run4" value="4" >4</button>'
+      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="run6" value="6" >6</button> '
+      modal += '</div>'
+
+      modal += '<div class="mt-4">'
+      modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="bye1">B1</button> '
+      modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="bye2">B2</button> '
+      modal += '<button class="event_btn btn btn-outline-secondary btn-sm ml-2" id="bye3">B3</button> '
+      modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="bye4">B4</button> '
+      modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="bye5">B5</button> '
+      modal += '</div>'
+
+      modal += '<div class="mt-4">'
+      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="wide" >Wd</button> '
+      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="noball" >NB</button> '
+      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="wicket" >Wicket</button>'
+      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="reverserun" >--</button> '
+      modal += '</div>'
+
+      modal += '</div>'
+      modal += '</div>'
+      $(".bowl_head").remove()
+      $("#bowl").empty()
+      $('#bowl').append(modal)
+
+
+    }
+    else {
+      var bowl = ""
+      bowl += '<div class="bowl_head">'
+      bowl += '<h6 class="">Add Bowler  '
+      bowl += '<button class="float-right btn btn-outline-info btn-sm" type="button" id="Add_bowler"><i class="fa fa-plus" aria-hidden="true"></i></button>'
+      bowl += '</h6>'
+      bowl += '</div>'
+      $(".bowl_head").remove()
+      $("#bowl").empty()
+      $('#bowl').append(bowl)
+
+    }
+    // ####### Score Board
+
+    var sc = "";
+    sc += '<div id="score_card">'
+    sc += '<h5 class="float-left">Score</h5><small class="float-right"><i><b>' + matchinfo["toss_own"] + '</b></i> Own The Toss And <i><b>' + matchinfo["toss_own_options"] + '</b></i></small>'
+    sc += '<div class="clearfix" ></div>'
+    sc += '<div style="display: flex;justify-content: space-between;">'
+    sc += '<div> '
+    sc += '<i class=""><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i><br>'
+    sc += '<i class="">CRR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i><br>'
+    sc += '</div>'
+    sc += '<div>'
+    if (matchinfo["first_ins_complete"]) {
+      sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b> <strong> ' + matchinfo["second_ins_runs"] + ' / ' + matchinfo["second_ins_wkts"] + ' (' + matchinfo["second_ins_overs"] + ')</strong></i><br>'
+      sc += '<i class="">CRR<span class="ml-1">' + matchinfo["second_ins_crr"] + '</span></i> <br>'
+    } else {
+      sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b></i></br>'
+    }
+
+    sc += '</div>'
+    sc += '</div>'
+    sc += '<center><h6 class="text-primary">Playing Squard</h6></center>'
+    sc += '<div style="display: flex;justify-content: space-between;">'
+    sc += '<div> '
+    squardA.forEach(function (item) {
+      sc += '<strong class="mr-2"><i class=""><b>' + item["player"]["name"] + '</b></i></strong>  ' + item["bat_runs"] + '/' + item["bat_balls"] + ' - (' + item["bowl_over"] + '/' + item["bowl_wicket"] + ')<br>'
+    })
+    sc += '</div>'
+    sc += '<div>'
+    squardB.forEach(function (item) {
+      sc += '<strong class="mr-2"><i class=""><b>' + item["player"]["name"] + '</b></i></strong>  ' + item["bat_runs"] + '/' + item["bat_balls"] + ' - (' + item["bowl_over"] + '/' + item["bowl_wicket"] + ')<br>'
+    })
+    sc += '</div>'
+    sc += '</div>'
+    sc += '</div>'
+    $('#score_card').remove()
+    $('.playing_squard').empty()
+    $('.playing_squard').append(sc)
+  }
+
+  /// RUN END COUNTER
+  $(document).ready(function () {
+
+    $.ajax({
+      url: "{% url 'loading_livematch' %}",
+      type: "GET",
+      data: {
+        "match_info": "{{match_info.id}}"
+      },
+      cache: false,
+      success: function (result) {
+        if (result["status"]) {
+          var player = result["players"]
+          var score = result["score"]
+          var player_bowl = result["player_bowl"]
+          var bowl_score = result["bowl_score"]
+          var squardA = result["squardA"]
+          var squardB = result["squardB"]
+          var matchinfo = result["matchinfo"]
+          update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo)
+
+        }
+        else {
+          console.log(result["message"])
+        }
+
+      }
+    });
+
+  });
+
+
+  $(document).on("click", "#Add_batter_one", function () {
+
+    $.ajax({
+      url: "{% url 'fetch_batters' %}",
+      type: "GET",
+      data: {
+        "match_info": "{{match_info.id}}"
+      },
+      cache: false,
+      success: function (result) {
+        if (result["status"]) {
+          var obj = result["objs"]
+          var modal = ""
+          modal += '<div class="modal" id="Batmanone" >'
+          modal += '<div class="modal-dialog" role="document">'
+          modal += ' <div class="modal-content">'
+          modal += '<div class="modal-header">'
+          modal += '<h5 class="modal-title">Add Batsman</h5>'
+          modal += '<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>'
+          modal += '</div>'
+          modal += '<form >'
+          modal += '<div class="modal-body">'
+          obj.forEach(function (i) {
+            modal += '<div class="animated-radio-button">'
+            modal += '<label>'
+            modal += '<input type="radio" name="player_id_one" id="player_id_one" value="' + i["id"] + '" ><span class="label-text">' + i["name"] + '</span>'
+            modal += '</label>'
+            modal += '</div>'
+          });
+
+          modal += '</div>'
+          modal += '<div class="modal-footer">'
+          modal += '<div class="animated-checkbox mr-3">'
+          modal += ' <label>'
+          modal += '<input type="checkbox" name="is_stricker_one" id="is_stricker_two" value="True" ><span class="label-text">Is Strick End</span>'
+          modal += '</label>'
+          modal += '</div>'
+          modal += '<button class="btn btn-primary" type="button" id="add_batter_one_btn">Add</button>'
+          modal += '<button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>'
+          modal += '</div>'
+          modal += '</form>'
+          modal += '</div>'
+          modal += '</div>'
+          modal += '</div>'
+
+          $("#Batmanone").remove()
+          $('.app-content').append(modal)
+          $("#Batmanone").modal('show')
+
+        }
+        else {
+          console.log(result["message"])
+          console.log(result["message"])
+          console.log(result["message"])
+        }
+
+      }
+
+    });
+
+  });
+
+  $(document).on("click", "#Add_batter_two", function () {
+
+    $.ajax({
+      url: "{% url 'fetch_batters' %}",
+      type: "GET",
+      data: {
+        "match_info": "{{match_info.id}}"
+      },
+      cache: false,
+      success: function (result) {
+        if (result["status"]) {
+          var obj = result["objs"]
+          var modal = ""
+          modal += '<div class="modal" id="Batmantwo" >'
+          modal += '<div class="modal-dialog" role="document">'
+          modal += ' <div class="modal-content">'
+          modal += '<div class="modal-header">'
+          modal += '<h5 class="modal-title">Add Batsman</h5>'
+          modal += '<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>'
+          modal += '</div>'
+          modal += '<form >'
+          modal += '<div class="modal-body">'
+          obj.forEach(function (i) {
+            modal += '<div class="animated-radio-button">'
+            modal += '<label>'
+            modal += '<input type="radio" name="player_id_two" id="player_id_two" value="' + i["id"] + '" ><span class="label-text">' + i["name"] + '</span>'
+            modal += '</label>'
+            modal += '</div>'
+          });
+
+          modal += '</div>'
+          modal += '<div class="modal-footer">'
+          modal += '<div class="animated-checkbox mr-3">'
+          modal += ' <label>'
+          modal += '<input type="checkbox" name="is_stricker_two" id="is_stricker_two" value="True" ><span class="label-text">Is Strick End</span>'
+          modal += '</label>'
+          modal += '</div>'
+          modal += '<button class="btn btn-primary" type="button" id="add_batter_two_btn">Add</button>'
+          modal += '<button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>'
+          modal += '</div>'
+          modal += '</form>'
+          modal += '</div>'
+          modal += '</div>'
+          modal += '</div>'
+
+          $("#Batmantwo").remove()
+          $('.app-content').append(modal)
+          $("#Batmantwo").modal('show')
+
+        }
+        else {
+          console.log(result["message"])
+          console.log(result["message"])
+          console.log(result["message"])
+        }
+
+      }
+
+    });
+
+  });
+
+  // add new batter
+
+  $(document).on("click", "#add_batter_one_btn", function () {
+    var is_stricker = $("input[name='is_stricker_one']:checked").val()
+    var player_id = $("input[name='player_id_one']:checked").val()
+    if (player_id == '') {
+      alert("select batsman")
+    } else {
+      $.ajax({
+        url: "{% url 'ajax_add_batter' %}",
+        type: "GET",
+        data: {
+          "match_info": "{{match_info.id}}", "player_id": player_id, "is_stricker": is_stricker
+        },
+        cache: false,
+        success: function (result) {
+          if (result["status"]) {
+            var player = result["players"]
+            var score = result["score"]
+            var modal = ""
+            modal += '<div class="row">'
+            modal += '<div class="col-12 mb-2 border-bottom border-primary">'
+            modal += '<h6 class="">' + player["name"] + ' '
+            if (score["bat_is_striker"]) {
+              modal += '<sup class="text-danger"><i class="fa fa-star"></i></sup>'
+            }
+            modal += '<span class="ml-2"> (' + score["bat_runs"] + '/' + score["bat_balls"] + ')</span> </h6>'
+            modal += '</div>'
+            modal += '<div class="col-6">'
+            modal += '<img src="' + BASEURL + player["image"] + '" class="img-thumbnail" alt="logo">'
+            modal += '</div>'
+            modal += '<div class="col-6">'
+            modal += '<span class="badge badge-secondary mr-2">SR</span> ' + score["bat_strike_rate"] + '<br>'
+            modal += '<span class="badge badge-primary mr-2">4s</span> ' + score["bat_fours"] + '<br>'
+            modal += '<span class="badge badge-danger mr-2">6s</span> ' + score["bat_sixes"] + '<br>                '
+            modal += '</div>'
+            modal += '</div>'
+
+            $(".batone_head").remove()
+            $('#batone').append(modal)
+            $("#Batmanone").modal('hide')
+
+
+          }
+          else {
+            console.log(result["message"])
+          }
+
+        }
+
+      });
+    }
+
+  });
+
+
+  $(document).on("click", "#add_batter_two_btn", function () {
+
+    var player_id = $("input[name='player_id_two']:checked").val()
+    var is_stricker = $("input[name='is_stricker_two']:checked").val()
+    if (player_id == '') {
+      alert("select batsman")
+    } else {
+      $.ajax({
+        url: "{% url 'ajax_add_batter' %}",
+        type: "GET",
+        data: {
+          "match_info": "{{match_info.id}}", "player_id": player_id, "is_stricker": is_stricker
+        },
+        cache: false,
+        success: function (result) {
+          if (result["status"]) {
+            var player = result["players"]
+            var score = result["score"]
+            var modal = ""
+            modal += '<div class="row">'
+            modal += '<div class="col-12 mb-2 border-bottom border-primary">'
+            modal += '<h6 class="">' + player["name"] + ' '
+            if (score["bat_is_striker"]) {
+              modal += '<sup class="text-danger"><i class="fa fa-star"></i></sup>'
+            }
+            modal += '<span class="ml-2"> (' + score["bat_runs"] + '/' + score["bat_balls"] + ')</span> </h6>'
+            modal += '</div>'
+            modal += '<div class="col-6">'
+            modal += '<img src="' + BASEURL + player["image"] + '" class="img-thumbnail" alt="logo">'
+            modal += '</div>'
+            modal += '<div class="col-6">'
+            modal += '<span class="badge badge-secondary mr-2">SR</span> ' + score["bat_strike_rate"] + '<br>'
+            modal += '<span class="badge badge-primary mr-2">4s</span> ' + score["bat_fours"] + '<br>'
+            modal += '<span class="badge badge-danger mr-2">6s</span> ' + score["bat_sixes"] + '<br>                '
+            modal += '</div>'
+            modal += '</div>'
+
+            $(".battwo_head").remove()
+            $('#battwo').append(modal)
+            $("#Batmantwo").modal('hide')
+
+
+          }
+          else {
+            console.log(result["message"])
+          }
+
+        }
+      });
+
+    }
+  });
+
+  $(document).on("click", "#Add_bowler", function () {
+
+    $.ajax({
+      url: "{% url 'fetch_bowlers' %}",
+      type: "GET",
+      data: {
+        "match_info": "{{match_info.id}}"
+      },
+      cache: false,
+      success: function (result) {
+        if (result["status"]) {
+          var obj = result["objs"]
+          var modal = ""
+          modal += '<div class="modal" id="Bowlermodal" >'
+          modal += '<div class="modal-dialog" role="document">'
+          modal += ' <div class="modal-content">'
+          modal += '<div class="modal-header">'
+          modal += '<h5 class="modal-title">Add Bowler</h5>'
+          modal += '<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>'
+          modal += '</div>'
+          modal += '<form >'
+          modal += '<div class="modal-body">'
+          obj.forEach(function (i) {
+            modal += '<div class="animated-radio-button">'
+            modal += '<label>'
+            modal += '<input type="radio" name="bowler_id" id="bowler_id" value="' + i["id"] + '" ><span class="label-text">' + i["name"] + '</span>'
+            modal += '</label>'
+            modal += '</div>'
+          });
+
+          modal += '</div>'
+          modal += '<div class="modal-footer">'
+          modal += '<button class="btn btn-primary" type="button" id="Add_bowler_btn">Add</button>'
+          modal += '<button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>'
+          modal += '</div>'
+          modal += '</form>'
+          modal += '</div>'
+          modal += '</div>'
+          modal += '</div>'
+
+          $("#Bowlermodal").remove()
+          $('.app-content').append(modal)
+          $("#Bowlermodal").modal('show')
+
+        }
+        else {
+          console.log(result["message"])
+
+        }
+
+      }
+
+    });
+
+  });
+
+  $(document).on("click", "#Add_bowler_btn", function () {
+    var bowler_id = $("input[name='bowler_id']:checked").val()
+    $.ajax({
+      url: "{% url 'ajax_add_bowler' %}",
+      type: "GET",
+      data: {
+        "match_info": "{{match_info.id}}", "bowler_id": bowler_id
+      },
+      cache: false,
+      success: function (result) {
+        if (result["status"]) {
+          var player = result["players"]
+          var score = result["score"]
+          var modal = ""
+          modal += '<div class="row">'
+          modal += '<div class="col-6">'
+          modal += '<div class="row">'
+          modal += '<div class="col-12 mb-2 border-bottom  border-primary">'
+          modal += '<h6 class="">' + player["name"] + ''
+          modal += '<span class="ml-2"> (' + score["bowl_over"] + '/' + score["bowl_wicket"] + ')</span> </h6>'
+          modal += '</div>'
+          modal += '<div class="col-6">'
+          modal += '<img src="' + BASEURL + player["image"] + '" class="img-thumbnail" alt="logo">'
+          modal += '</div>'
+          modal += '<div class="col-6">'
+          modal += '<span class="badge badge-secondary mr-2">Eco</span> ' + score["bowl_economy"] + ' <br>'
+          modal += '<span class="badge badge-primary mr-2">Runs</span> ' + score["bowl_runs"] + ' <br>'
+          modal += '</div>'
+          modal += '</div>'
+          modal += '</div>'
+
+          modal += '<div class="col-6  pr-2 border-left  border-primary">'
+          modal += '<div class="">'
+          modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="run0" value="0" >0</button> '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="run1" value="1" >1</button>  '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="run2" value="2" >2</button>  '
+          modal += '<button class="event_btn btn btn-outline-secondary btn-sm ml-2" id="run3" value="3" >3</button>'
+          modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="run4" value="4" >4</button>'
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="run6" value="6" >6</button> '
+          modal += '</div>'
+    
+          modal += '<div class="mt-4">'
+          modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="bye1">B1</button> '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="bye2">B2</button> '
+          modal += '<button class="event_btn btn btn-outline-secondary btn-sm ml-2" id="bye3">B3</button> '
+          modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="bye4">B4</button> '
+          modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="bye5">B5</button> '
+          modal += '</div>'
+    
+          modal += '<div class="mt-4">'
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="wide" >Wd</button> '
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="noball" >NB</button> '
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="wicket" >Wicket</button>'
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="reverserun" >--</button> '
+          modal += '</div>'
+
+          modal += '</div>'
+          modal += '</div>'
+
+
+
+          $(".bowl_head").remove()
+          $('#bowl').append(modal)
+          $("#Bowlermodal").modal('hide')
+
+        }
+        else {
+          console.log(result["message"])
+          console.log(result["message"])
+          console.log(result["message"])
+        }
+
+      }
+
+    });
+
+  });
+
+
+  // run updater function 
+
+  $(document).on("click", "#run0,#run1,#run2,#run3,#run4,#run6", function () {
+   var val =  $(this).val()
+   $(this).html('<i class="fa fa-spinner fa-spin" style="font-size:15px;"></i>');
+   $('.event_btn').attr('disabled', true);
+    $.ajax({
+      url: "{% url 'ajax_update_live_runs' %}",
+      type: "GET",
+      data: {
+        "match_info": "{{match_info.id}}","run":val
+      },
+      cache: false,
+      success: function (result) {
+        if (result["status"]) {
+          $(this).html(val);
+          $('.event_btn').attr('disabled', false);
+          var player = result["players"]
+          var score = result["score"]
+          var player_bowl = result["player_bowl"]
+          var bowl_score = result["bowl_score"]
+          var squardA = result["squardA"]
+          var squardB = result["squardB"]
+          var matchinfo = result["matchinfo"]
+          update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo)
+
+        }
+        else {
+          console.log(result["message"])
+        }
+
+      }
+    });
+
+  });
+
+ 
+
+</script>
+{% endblock js %}

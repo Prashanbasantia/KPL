@@ -1,0 +1,48 @@
+{% extends 'Index_App/base.html' %} {% load static %} {% block main_content %}
+<section class="our-services" id="services">
+  <div class="container mb-3">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card" style="background-color: #f7f7f7;box-shadow: 1px 2px 3px 1px #b1abab;">
+			<div class="card-header">
+				<h6 class="card-title text-primary">Players</h6>
+			</div>
+		  <div class="card-body">
+        <table class="table table-hover table-bordered " id="sampleTable">
+				<thead>
+				  <tr>
+					<th>Team</th>
+					<th>Mat</th>
+					<th>L</th>
+					<th>W</th>
+					<th>P</th>
+					<th>RR</th>
+				  </tr>
+				</thead>
+				<tbody>
+				  {% for p in point_table %}
+				  <tr>
+					<td>
+					  <a href="">{{p.team.name}}</a>
+					</td>
+					<td>{{p.matches}}</td>
+					<td>{{p.lose}}</td>
+					<td>{{p.win}}</td>
+					<td>{{p.point}}</td>
+					<td>{{p.run_rate}}</td>
+				  </tr>
+				  {% endfor %}
+				</tbody>
+			  </table>
+		  </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock main_content %}
+{% block js %}
+
+{% endblock js %}

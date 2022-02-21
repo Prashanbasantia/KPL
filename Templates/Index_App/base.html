@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Required meta tags --> 
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>Marshmallow Bootstrap Admin Dashboard Template</title>
+		<link rel="stylesheet" href="{% static 'Index_App/vendors/mdi/css/materialdesignicons.min.css' %}">
+		<link rel="stylesheet" href="{% static 'Index_App/vendors/owl.carousel/css/owl.carousel.css' %}">
+		<link rel="stylesheet" href="{% static 'Index_App/vendors/owl.carousel/css/owl.theme.default.min.css' %}">
+		<link rel="stylesheet" href="{% static 'Index_App/vendors/aos/css/aos.css' %}">
+		<link rel="stylesheet" href="{% static 'Index_App/vendors/jquery-flipster/css/jquery.flipster.css' %}">
+		<link rel="stylesheet" href="{% static 'Index_App/css/style.css' %}">
+		<link rel="shortcut icon" href="{% static 'Index_App/images/favicon.png' %}"/>
+	</head>
+	<body data-spy="scroll" data-target=".navbar" data-offset="50">
+		<div id="mobile-menu-overlay"></div>
+		<nav class="navbar navbar-expand-lg fixed-top">
+			<div class="container">
+				<a class="navbar-brand" href="#"><img src="{% static 'Index_App/images/logo.svg' %}" alt="Marshmallow"></a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"><i class="mdi mdi-menu"> </i></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+					<div class="d-lg-none d-flex justify-content-between px-4 py-3 align-items-center">
+						<img src="{% static 'Index_App/images/logo-dark.svg' %}" class="logo-mobile-menu" alt="logo">
+						<a href="javascript:;" class="close-menu"><i class="mdi mdi-close"></i></a>
+					</div>
+
+					<ul class="navbar-nav ml-auto align-items-center">
+						{% url 'home' as home %}
+						<li class="nav-item ">
+							<a class="nav-link {% if request.path == home %}active{% endif %}" href="{{home}}">Home <span class="sr-only">(current)</span></a>
+						</li>
+						
+						{% url 'review' as review %}
+						<li class="nav-item ">
+							<a class="nav-link {% if request.path == review %}active{% endif %}" href="{{review}}">Review</a>
+						</li>
+						{% url 'schedule' as schedule %}
+						<li class="nav-item ">
+							<a class="nav-link {% if request.path == schedule %}active{% endif %}" href="{{schedule}}">Schedule</a>
+						</li>
+
+						{% url 'points' as points %}
+						<li class="nav-item ">
+							<a class="nav-link {% if request.path == points %}active{% endif %}" href="{{points}}">Points</a>
+						</li>
+						{% url 'players' as players %}
+						<li class="nav-item ">
+							<a class="nav-link {% if request.path == players %}active{% endif %}" href="{{players}}">Players</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class="page-body-wrapper">
+			
+			{% block main_content %}
+				
+			{% endblock main_content %}
+				
+		</div>
+
+		<footer class="footer">
+			<div class="footer-top" style="padding: 30px 0;">
+				<div class="container">
+					<div class="row">
+						<div class="col-sm-6">
+							<img src="{% static 'Index_App/images/logo.svg' %}" alt="Marshmallow"></a>
+							<address>
+								<p>kansar Premier League</p>
+								<div class="d-flex align-items-center">
+									<a href="mailto:info@yourmail.com" class="footer-link">info@yourmail.com</a>
+								</div>
+							</address>
+							
+						</div>
+						<div class="col-sm-6">
+							<div class="row">
+								<div class="col-sm-4">
+									<h6 class="footer-title">Links</h6>
+									<ul class="list-footer">
+										<li><a href="#" class="footer-link">Home</a></li>
+										<li><a href="#" class="footer-link">Teams</a></li>
+										<li><a href="#" class="footer-link">Players</a></li>
+									</ul>
+								</div>
+								<div class="col-sm-4">
+									<h6 class="footer-title">Links</h6>
+									<ul class="list-footer">
+										<li><a href="#" class="footer-link">Review</a></li>
+										<li><a href="#" class="footer-link">Point Table</a></li>
+										<li><a href="#" class="footer-link">schedule</a></li>
+									</ul>
+								</div>
+								<div class="col-sm-4">
+									<div class="social-icons">
+										<h6 class="footer-title font-weight-bold">
+											Social Share
+										</h6>
+										<div class="d-flex">
+											<a href="#"><i class="mdi mdi-facebook-box"></i></a>
+											<a href="#"><i class="mdi mdi-twitter"></i></a>
+											<a href="#"><i class="mdi mdi-dribbble"></i></a>
+										</div>
+									</div>
+								</div>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="footer-bottom">
+				<div class="container">
+					<div class="d-flex justify-content-between align-items-center">
+						<div class="d-flex align-items-center">
+							<img src="{% static 'Index_App/images/logo.svg' %}" alt="logo" class="mr-3">
+							<p class="mb-0 text-small pt-1">© 2021-2022 <a href="https://www.bootstrapdash.com" class="text-white" target="_blank">KPL</a>. All rights reserved.</p>
+						</div>
+						<div>
+							<div class="d-flex">
+								<a href="#" class="text-small text-white mx-2 footer-link">Privacy Policy </a>          
+								<a href="#" class="text-small text-white mx-2 footer-link">Customer Support </a>
+								<a href="#" class="text-small text-white mx-2 footer-link">Careers </a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<script src="{% static 'Index_App/vendors/base/vendor.bundle.base.js' %}"></script>
+		<script src="{% static 'Index_App/vendors/owl.carousel/js/owl.carousel.js' %}"></script>
+		<script src="{% static 'Index_App/vendors/aos/js/aos.js' %}"></script>
+		<script src="{% static 'Index_App/vendors/jquery-flipster/js/jquery.flipster.min.js' %}"></script>
+		<script src="{% static 'Index_App/js/template.js' %}"></script>
+		{% block js %}
+				
+		{% endblock js %}
+	</body>
+</html>
