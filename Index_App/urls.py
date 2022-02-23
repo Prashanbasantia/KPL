@@ -24,6 +24,7 @@ urlpatterns = [
     path('schedule/', views.schedule,name="schedule"),
     path('points/', views.point_table,name="points"),
     path('players/', views.players,name="players"),
+    path('match_live/', views.match_live,name="match_live"),
     path('fetch_user_livematch_home/', views.fetch_user_livematch_home,name="fetch_user_livematch_home"),
-
+    path('ajax_live_match/', views.ajax_live_match,name="ajax_live_match"),
 ]

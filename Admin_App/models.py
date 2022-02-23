@@ -77,6 +77,9 @@ class MatchInfo(models.Model):
     first_ins = models.ForeignKey(Teams,on_delete=models.CASCADE,related_name='first_ins')
     first_ins_runs = models.IntegerField(default=0)
     first_ins_extra_runs = models.IntegerField(default=0)
+    first_ins_extra_wd = models.IntegerField(default=0)
+    first_ins_extra_nb = models.IntegerField(default=0)
+    first_ins_extra_bye = models.IntegerField(default=0)
     first_ins_wkts = models.IntegerField(default=0)
     first_ins_overs = models.FloatField(default=0.0)
     first_ins_crr = models.FloatField(default=0.0)
@@ -85,6 +88,9 @@ class MatchInfo(models.Model):
     second_ins = models.ForeignKey(Teams,on_delete=models.CASCADE,related_name='second_ins')
     second_ins_runs = models.IntegerField(default=0)
     second_ins_extra_runs = models.IntegerField(default=0)
+    second_ins_extra_wd = models.IntegerField(default=0)
+    second_ins_extra_nb = models.IntegerField(default=0)
+    second_ins_extra_bye = models.IntegerField(default=0)
     second_ins_wkts = models.IntegerField(default=0)
     second_ins_overs = models.FloatField(default=0.0)
     second_ins_crr = models.FloatField(default=0.0)
@@ -120,6 +126,32 @@ class PlayerScore(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now_add=True)
 
+
+class OverDetails(models.Model):
+    id = models.AutoField(primary_key=True)
+    matchinfo = models.ForeignKey(MatchInfo,on_delete=models.CASCADE)
+    player = models.ForeignKey(Players,on_delete=models.CASCADE)
+    over_status=models.BooleanField(default=False)
+    
+    over_runs=models.IntegerField(default=0)
+    ball_count=models.IntegerField(default=0)
+    over_wicket=models.IntegerField(default=0)
+
+    over_ball_one=models.IntegerField(default=0)
+    over_ball_two=models.IntegerField(default=0)
+    over_ball_three=models.IntegerField(default=0)
+    over_ball_four=models.IntegerField(default=0)
+    over_ball_five=models.IntegerField(default=0)
+    over_ball_six=models.IntegerField(default=0)
+
+    over_run_wd = models.IntegerField(default=0)
+    over_run_nb = models.IntegerField(default=0)
+    over_run_bye = models.IntegerField(default=0)
+
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now_add=True)
+
+
 class PlayingSquard(models.Model):
     id = models.AutoField(primary_key=True)
     schedule = models.ForeignKey(Schedule,on_delete=models.CASCADE)       
@@ -141,13 +173,14 @@ class PointTable(models.Model):
 
 class FallWicket(models.Model):
     matchinfo = models.ForeignKey(MatchInfo,on_delete=models.CASCADE)       
-    team = models.ForeignKey(Teams,on_delete=models.CASCADE)       
+    team = models.ForeignKey(Teams,on_delete=models.CASCADE) 
     run=models.IntegerField(default=0)
     wicket=models.IntegerField(default=0)
     over=models.IntegerField(default=0)
     run_rate=models.FloatField(default=0.0)
     batter=models.ForeignKey(Players,on_delete=models.CASCADE,related_name='batter')
-    bowler=models.ForeignKey(Players,on_delete=models.CASCADE,related_name='bowler')
+    bowler=models.ForeignKey(Players,on_delete=models.CASCADE,related_name='bowler',null=True)
+    
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now_add=True)
 

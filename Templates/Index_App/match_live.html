@@ -1,0 +1,162 @@
+{% extends 'Index_App/base.html' %}
+{% load static %}
+
+{% block main_content %}
+	
+<section id="" class="">
+	<div class="container">
+		<div class="row">
+			<!-- bowl -->
+			<div class="col-lg-12">
+			  <div class="card ">
+				  <div class="card-body playing_squard">
+
+				  </div>
+	  
+			  </div>
+			</div>
+			<!-- endbowl -->
+		  </div>
+	</div>
+</section>
+
+{% endblock main_content %}
+
+{% block js %}
+<script type="text/javascript">
+	var BASEURL = "http://127.0.0.1:8008"
+	///// RUN COUNTER
+	function update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo) {
+	  // ####### Bolrwe player
+	  // ####### Score Board
+  
+	  var sc = "";
+	  sc += '<div id="score_card" class="mt-2 mb-4">'
+	  sc += '<small style="text-align:center;">  <i><b>' + matchinfo["toss_own"] + '</b></i> Won The Toss And <i><b>' + matchinfo["toss_own_options"] + '</b></i></small>'
+	  sc += '<div class="clearfix" ></div>'
+
+	  sc += '<div style="display: flex;justify-content: space-between; margin-top:10px;">'
+	  sc += '<div> '
+	  sc += '<i class=""><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i><br>'
+	  sc += '<i class="">CRR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i><br> <i class="">Extras<span class="ml-1">' + matchinfo["first_ins_extra_runs"] + ' (wd-'+matchinfo["first_ins_extra_wd"] +', nb-'+ matchinfo["first_ins_extra_nb"]+', b-'+matchinfo["first_ins_extra_bye"] +')</span></i> <br>'
+	  sc += '</div>'
+	  sc += '<div>'
+	  if (matchinfo["first_ins_complete"]) {
+		sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b> <strong> ' + matchinfo["second_ins_runs"] + ' / ' + matchinfo["second_ins_wkts"] + ' (' + matchinfo["second_ins_overs"] + ')</strong></i><br>'
+		sc += '<i class="">CRR<span class="ml-1">' + matchinfo["second_ins_crr"] + '</span></i> <br> <i class="">Extras<span class="ml-1">' + matchinfo["second_ins_extra_runs"] + ' (wd-'+matchinfo["second_ins_extra_wd"] +', nb-'+ matchinfo["second_ins_extra_nb"]+', b-'+matchinfo["second_ins_extra_bye"] +')</span></i> <br>'
+	  } else {
+		sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b></i></br>'
+	  }
+  
+	  sc += '</div>'
+	  sc += '</div>'
+	 
+	  sc += '<div class="row">'
+	  sc += '<div class="col-lgA-6"> '
+		sc += '<center><h6 class="text-primary mt-2">Playing Squard ' + matchinfo["first_ins"]['name'] + '</h6></center>'
+		sc += '<table class="table table-sm table-bordered">'
+		  sc += '<thead>'
+			sc += '<tr>'
+			  sc += '<th>Player</th>'
+			  sc += '<th>R</th>'
+			  sc += '<th>B</th>'
+			  sc += '<th>Sr</th>'
+			  sc += '<th>Ov</th>'
+			  sc += '<th>Wc</th>'
+			  sc += '<th>Rc</th>'
+			  sc += '<th>Eco</th>'
+			sc += '</tr>'
+		  sc += '</thead>'
+		  sc += '<tbody>'
+			squardA.forEach(function (item) {
+			sc += '<tr>'
+			  sc += '<td> '+item["player"]["name"]+' </td>'
+			  sc += '<td> '+item["bat_runs"]+' </td>'
+			  sc += '<td> '+item["bat_balls"]+' </td>'
+			  sc += '<td> '+item["bat_strike_rate"]+' </td>'
+			  sc += '<td> '+item["bowl_over"]+' </td>'
+			  sc += '<td> '+item["bowl_wicket"]+' </td>'
+			  sc += '<td> '+item["bowl_runs"]+' </td>'
+			  sc += '<td> '+item["bowl_economy"]+' </td>'
+			sc += '</tr>'
+		  })
+		  sc += '</tbody>'
+		sc += '</table>'
+  
+	  sc += '</div>'
+	  sc += '<div class="col-lg-6">'
+		sc += '<center><h6 class="text-primary mt-2">Playing Squard ' + matchinfo["second_ins"]['name'] + '</h6></center>'
+		sc += '<table class="table table-sm table-bordered">'
+		  sc += '<thead>'
+			sc += '<tr>'
+			  sc += '<th>Player</th>'
+			  sc += '<th>R</th>'
+			  sc += '<th>B</th>'
+			  sc += '<th>Sr</th>'
+			  sc += '<th>Ov</th>'
+			  sc += '<th>Wc</th>'
+			  sc += '<th>Rc</th>'
+			  sc += '<th>Eco</th>'
+			sc += '</tr>'
+		  sc += '</thead>'
+		  sc += '<tbody>'
+			squardB.forEach(function (item) {
+			sc += '<tr>'
+			  sc += '<td> '+item["player"]["name"]+' </td>'
+			  sc += '<td> '+item["bat_runs"]+' </td>'
+			  sc += '<td> '+item["bat_balls"]+' </td>'
+			  sc += '<td> '+item["bat_strike_rate"]+' </td>'
+			  sc += '<td> '+item["bowl_over"]+' </td>'
+			  sc += '<td> '+item["bowl_wicket"]+' </td>'
+			  sc += '<td> '+item["bowl_runs"]+' </td>'
+			  sc += '<td> '+item["bowl_economy"]+' </td>'
+			sc += '</tr>'
+		  })
+		  sc += '</tbody>'
+		sc += '</table>'
+	  sc += '</div>'
+	  sc += '</div>'
+	  sc += '</div>'
+	  $('#score_card').remove()
+	  $('.playing_squard').empty()
+	  $('.playing_squard').append(sc)
+	}
+  
+	/// RUN END COUNTER
+	$(document).ready(function () {
+  setInterval(function(){
+	$.ajax({
+		url: "{% url 'ajax_live_match' %}",
+		type: "GET",
+		data: {
+		  "match_info": "{{matchinfo.id}}"
+		},
+		cache: false,
+		success: function (result) {
+		  if (result["status"]) {
+			var player = result["players"]
+			var score = result["score"]
+			var player_bowl = result["player_bowl"]
+			var bowl_score = result["bowl_score"]
+			var squardA = result["squardA"]
+			var squardB = result["squardB"]
+			var matchinfo = result["matchinfo"]
+			update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo)
+  
+		  }
+		  else {
+			console.log(result["message"])
+		  }
+  
+		}
+	  });
+
+  },500)
+	 
+  
+	});
+  
+
+  
+  </script>
+{% endblock js %}

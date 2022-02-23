@@ -147,3 +147,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'Static')]
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#kpl-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
+#kpl- git remote set-url origin https://Prashanbasantia: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@github.com/Prashanbasantia/KPL.git 

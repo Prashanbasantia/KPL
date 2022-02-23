@@ -15695,7 +15695,7 @@ be a descendant of the grid when it is being dragged.
   -webkit-font-smoothing: antialiased;
   width: 1em;
   display: inline-block;
-  margin-right: 10x;
+  margin-right: 10px;
   vertical-align: -2px;
 }
 

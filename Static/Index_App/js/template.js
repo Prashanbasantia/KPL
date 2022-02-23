@@ -18,6 +18,7 @@
 				}
 			}
 		})
+		
 		var wWidth = $(window).width();
 		var menuWidth = $(".navbar-collapse").width();
 		$(".navbar-toggler").click(function() {

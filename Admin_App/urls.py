@@ -34,5 +34,8 @@ urlpatterns = [
     path('ajax_add_batter', views.ajax_add_batter, name="ajax_add_batter"),
     path('ajax_add_bowler', views.ajax_add_bowler, name="ajax_add_bowler"),
     path('ajax_update_live_runs', views.ajax_update_live_runs, name="ajax_update_live_runs"),
-
+    path('ajax_update_live_extra_runs', views.ajax_update_live_extra_runs, name="ajax_update_live_extra_runs"),
+    path('ajax_update_live_wd_runs', views.ajax_update_live_wd_runs, name="ajax_update_live_wd_runs"),
+    path('fetch_wicket_player', views.fetch_wicket_player, name="fetch_wicket_player"),
+    path('ajax_update_player_wicket', views.ajax_update_player_wicket, name="ajax_update_player_wicket"),
 ]

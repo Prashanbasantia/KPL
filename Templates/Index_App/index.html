@@ -1,6 +1,6 @@
 {% extends 'Index_App/base.html' %}
 {% load static %}
-
+<title>{% block title %}KPL 2022{%endblock title%}</title>
 {% block main_content %}
 	
 <section id="home" class="home">
@@ -27,7 +27,7 @@
 										</p>
 									</div>
 							</div>
-							<a href="#" class="btn btn-danger mt-3">Live</a>
+							<a href="{% url 'match_live' %}" class="btn btn-danger mt-3">Live</a>
 						</div>
 						
 						<div class="mt-5 mt-lg-0">
@@ -38,6 +38,33 @@
 			</div>
 		</div>
 	</div>
+
+	<h3 class="ml-3 text-primary"> Top Batsman</h3>
+	<div class="mb-5" data-aos="fade-up">
+		<div class="owl-carousel-projects owl-carousel owl-theme" style="width: 100% important;">
+			<div class="item">
+				<img src="{%static 'Index_App/images/carousel/slider1.jpg' %}" alt="slider">
+			</div>
+			<div class="item">
+				<img src="{%static 'Index_App/images/carousel/slider2.jpg' %}" alt="slider">
+			</div>
+			<div class="item">
+				<img src="{%static 'Index_App/images/carousel/slider3.jpg' %}" alt="slider">
+			</div>
+			<div class="item">
+				<img src="{%static 'Index_App/images/carousel/slider4.jpg' %}" alt="slider">
+			</div>
+			<div class="item">
+				<img src="{%static 'Index_App/images/carousel/slider5.jpg' %}" alt="slider">
+			</div>
+			<div class="item">
+				<img src="{%static 'Index_App/images/carousel/slider1.jpg' %}" alt="slider">
+			</div>
+			
+		</div>
+	</div>
+
+	
 </section>
 {% endblock main_content %}
 
@@ -76,7 +103,7 @@ var BASEURL="http://127.0.0.1:8008"
 			  }
 	
 			});
-		},500)
+		},500000)
          
       
   });

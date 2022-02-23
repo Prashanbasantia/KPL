@@ -415,38 +415,60 @@ def livematch_details(request,id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated],)
 def loading_livematch(request):
-    match_info_id = request.GET.get('match_info')
-    match_info = MatchInfo.objects.get(id = match_info_id)
+    try:
+        match_info_id = request.GET.get('match_info')
+        match_info = MatchInfo.objects.get(id = match_info_id)
 
-    batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
-    player = Players.objects.filter(id__in=batter.values('player'))
+        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
+        player = Players.objects.filter(id__in=batter.values('player'))
 
-    bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
-    player_bowl = Players.objects.filter(id__in=bowler.values('player'))
+        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+        player_bowl = Players.objects.filter(id__in=bowler.values('player'))
 
 
-    score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
-    bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
+        score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
+        bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
 
-    playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
-    playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
+        playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
+        playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
 
-    squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player'))
-    squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player'))
-    data={
-    "message":"success",
-    "status":True,
-    "players":PlayerImageSerializer(player,many=True).data,
-    "score":BatScoreSerializer(score,many=True).data,
+        squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player'))
+        squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player'))
+        if bowler:
+            over_details = OverDetails.objects.filter(matchinfo = match_info_id,player = bowler[0].player.id)
+            over_details_serializer = OverDetailsSerializer(over_details,many=True).data
+        else:
+            over_details_serializer = []
 
-    "player_bowl":PlayerImageSerializer(player_bowl,many=True).data,
-    "bowl_score":BowlScoreSerializer(bowl_score,many=True).data,
+        data={
+        "message":"success",
+        "status":True,
+        "players":PlayerImageSerializer(player,many=True).data,
+        "score":BatScoreSerializer(score,many=True).data,
 
-    "squardA":PlayerSquardScoreSerializer(squardA,many=True).data,
-    "squardB":PlayerSquardScoreSerializer(squardB,many=True).data,
-    "matchinfo":MatchinfoSerializer(match_info).data
-    }
-    return Response(data,status=status.HTTP_200_OK)
+        "player_bowl":PlayerImageSerializer(player_bowl,many=True).data,
+        "bowl_score":BowlScoreSerializer(bowl_score,many=True).data,
+
+        "squardA":PlayerSquardScoreSerializer(squardA,many=True).data,
+        "squardB":PlayerSquardScoreSerializer(squardB,many=True).data,
+        "matchinfo":MatchinfoSerializer(match_info).data,
+        "over_details":over_details_serializer
+        }
+        return Response(data,status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
+        data={
+            "message":e,
+            "status":False,
+            }
+        return Response(data,status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated],)
@@ -550,8 +572,6 @@ def ajax_add_batter(request):
             }
         return Response(data,status=status.HTTP_200_OK)
 
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated],)
 def ajax_add_bowler(request):
@@ -564,11 +584,13 @@ def ajax_add_bowler(request):
             bowl_score = PlayerScore.objects.get(matchinfo = match_info.id,player = player_id)
             bowl_score.bowl_status = "Bowling"       
             bowl_score.save()
+            OverDetails.objects.create(matchinfo=match_info,player=player,over_status = True)
             data={
                 "message":"success",
                 "status":True,
                 "players":PlayerImageSerializer(player).data,
-                "score":BowlScoreSerializer(bowl_score).data
+                "score":BowlScoreSerializer(bowl_score).data,
+                "over_details":OverDetailsSerializer(OverDetails.objects.filter(matchinfo = match_info_id,player =player.id),many=True).data
                 }      
             return Response(data,status=status.HTTP_200_OK)
     except Exception as e:
@@ -621,14 +643,14 @@ def ajax_update_live_runs(request):
                 ov = cal_over(ba)
                 match_info.second_ins_runs = match_info.second_ins_runs+run
                 match_info.secondins_overs = ov
-                match_info.second_ins_crr = round(match_info.second_ins_runs+run/ov,2)
+                match_info.second_ins_crr = round((match_info.second_ins_runs+run)/ov,2)
                 match_info.save()
             else:
                 ba = cal_ball(match_info.first_ins_overs)+1
                 ov = cal_over(ba)
                 match_info.first_ins_runs = match_info.first_ins_runs+run
                 match_info.first_ins_overs = ov
-                match_info.first_ins_crr = round(match_info.first_ins_runs+run/ov,2)
+                match_info.first_ins_crr = round((match_info.first_ins_runs+run)/ov,2)
                 match_info.save()
 
             if run%2 == 0:
@@ -652,10 +674,50 @@ def ajax_update_live_runs(request):
             bowler__player = bowler[0]
             bba = cal_ball(bowler__player.bowl_over)+1
             bov = cal_over(bba)
+            eco = (bowler__player.bowl_runs+run)/bov
             bowler__player.bowl_runs=bowler__player.bowl_runs+run
             bowler__player.bowl_over=bov
-            bowler__player.bowl_economy=round(bowler__player.bowl_runs+run/bov,2)
+            bowler__player.bowl_economy=round(eco,2)
             bowler__player.save()
+
+            od = OverDetails.objects.filter(over_status = True,matchinfo = match_info_id,player = bowler__player.player.id).first()
+            if od.ball_count == 0:
+                od.over_runs = od.over_runs + run
+                od.ball_count = od.ball_count + 1
+                od.over_ball_one = run
+                od.save()
+                print("od saved 1")
+            elif od.ball_count == 1:
+                od.over_runs = od.over_runs + run
+                od.ball_count = od.ball_count + 1
+                od.over_ball_two = run
+                od.save()
+                print("od saved 2")
+            elif od.ball_count == 2:
+                od.over_runs = od.over_runs + run
+                od.ball_count = od.ball_count + 1
+                od.over_ball_three = run
+                od.save()
+            elif od.ball_count == 3:
+                od.over_runs = od.over_runs + run
+                od.ball_count = od.ball_count + 1
+                od.over_ball_four = run
+                od.save()
+            elif od.ball_count == 4:
+                od.over_runs = od.over_runs + run
+                od.ball_count = od.ball_count + 1
+                od.over_ball_five = run
+                od.save()
+            elif od.ball_count == 5:
+                od.over_runs = od.over_runs + run
+                od.ball_count = od.ball_count + 1
+                od.over_ball_six = run
+                od.save()
+            elif od.ball_count == 6:
+                od.over_status = False
+                od.save()
+            
+            
             #check over end
             is_endball = int(str(float(bov)).split('.')[1])
             if is_endball == 0:
@@ -666,11 +728,134 @@ def ajax_update_live_runs(request):
                     non_stricker.save()
                 bowler__player.bowl_status="Recent"
                 bowler__player.save()
-                recent_bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status = "Recent")[:1]
-                if recent_bowler[0]:
-                    recent_bowler[0].bowl_status = "Not Bowling"
-                    recent_bowler[0].save()
+                #recent bowler
+                recent_bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status = "Recent").exclude(id = bowler__player.id)
+                if recent_bowler.exists():
+                    rec_bowl = recent_bowler.first()
+                    print("recent player",rec_bowl.player.name)
+                    rec_bowl.bowl_status = "Not Bowling"
+                    rec_bowl.save()
                     print("recenet change")
+
+            player = Players.objects.filter(id__in=batter.values('player'))
+            player_bowl = Players.objects.filter(id__in=bowler.values('player'))
+            score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
+            bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
+            playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
+            playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
+            squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player'))
+            squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player'))
+            data={
+            "message":"success",
+            "status":True,
+            "players":PlayerImageSerializer(player,many=True).data,
+            "score":BatScoreSerializer(score,many=True).data,
+
+            "player_bowl":PlayerImageSerializer(player_bowl,many=True).data,
+            "bowl_score":BowlScoreSerializer(bowl_score,many=True).data,
+
+            "squardA":PlayerSquardScoreSerializer(squardA,many=True).data,
+            "squardB":PlayerSquardScoreSerializer(squardB,many=True).data,
+            "matchinfo":MatchinfoSerializer(match_info).data,
+            "over_details":OverDetailsSerializer(OverDetails.objects.filter(matchinfo = match_info_id,player = bowler__player.player.id),many=True).data
+            }
+            return Response(data,status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
+        data={
+            "message":e,
+            "status":False,
+            }
+        return Response(data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated],)
+def ajax_update_live_extra_runs(request):
+    try:
+        match_info_id = request.GET.get('match_info')
+        run = int(request.GET.get('run'))
+        is_leg_bye = bool(request.GET.get('is_leg_bye'))
+        match_info = MatchInfo.objects.get(id = match_info_id)
+        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
+        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+        with transaction.atomic():
+            if batter[0].bat_is_striker:
+                stricker= batter[0]
+                non_stricker = batter[1]
+            else:
+                stricker= batter[1]
+                non_stricker = batter[0]
+
+            if match_info.first_ins_complete:
+                ba = cal_ball(match_info.second_ins_overs)+1
+                ov = cal_over(ba)
+                match_info.second_ins_runs = match_info.second_ins_runs+run
+                match_info.second_ins_extra_runs = match_info.second_ins_extra_runs+run
+                match_info.second_ins_extra_bye = match_info.second_ins_extra_bye+run
+                match_info.secondins_overs = ov
+                match_info.second_ins_crr = round((match_info.second_ins_runs+run)/ov,2)
+                match_info.save()
+            else:
+                ba = cal_ball(match_info.first_ins_overs)+1
+                ov = cal_over(ba)
+                match_info.first_ins_runs = match_info.first_ins_runs+run
+                match_info.first_ins_extra_runs = match_info.first_ins_extra_runs+run
+                match_info.first_ins_extra_bye = match_info.first_ins_extra_bye+run
+                match_info.first_ins_overs = ov
+                match_info.first_ins_crr = round((match_info.first_ins_runs+run)/ov,2)
+                match_info.save()
+
+            if run%2 == 0:
+                if is_leg_bye:
+                    stricker.bat_balls= stricker.bat_balls+1 
+                    stricker.bat_strike_rate = round(((stricker.bat_runs)/(stricker.bat_balls+1))*100,2)
+                    stricker.save()
+            else:
+                if is_leg_bye:
+                    stricker.bat_balls= stricker.bat_balls+1 
+                    stricker.bat_strike_rate = round(((stricker.bat_runs)/(stricker.bat_balls+1))*100,2)
+                    stricker.save()
+
+                stricker.bat_is_striker = False
+                stricker.save()
+                non_stricker.bat_is_striker = True
+                non_stricker.save()
+            #bowler update 
+            od = OverDetails.objects.filter(over_status = True,matchinfo = match_info_id,player = bowler__player.id).first()
+            od.over_run_bye = od.over_run_bye.run
+            od.save()
+
+            if is_leg_bye:
+                bowler__player = bowler[0]
+                bba = cal_ball(bowler__player.bowl_over)+1
+                bov = cal_over(bba)
+                eco = (bowler__player.bowl_runs)/bov
+                bowler__player.bowl_over=bov
+                bowler__player.bowl_economy=round(eco,2)
+                bowler__player.save()
+                #check over end
+                is_endball = int(str(float(bov)).split('.')[1])
+                if is_endball == 0:
+                    if run%2 == 0:
+                        stricker.bat_is_striker = False
+                        stricker.save()
+                        non_stricker.bat_is_striker = True
+                        non_stricker.save()
+                    bowler__player.bowl_status="Recent"
+                    bowler__player.save()
+                    #recent bowler
+                    recent_bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status = "Recent").exclude(id = bowler__player.id)
+                    if recent_bowler.exists():
+                        rec_bowl = recent_bowler.first()
+                        rec_bowl.bowl_status = "Not Bowling"
+                        rec_bowl.save()
+            
             player = Players.objects.filter(id__in=batter.values('player'))
             player_bowl = Players.objects.filter(id__in=bowler.values('player'))
             score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
@@ -708,5 +893,463 @@ def ajax_update_live_runs(request):
             }
         return Response(data,status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated],)
+def ajax_update_live_wd_runs(request):
+    try:
+        match_info_id = request.GET.get('match_info')
+        is_wd = request.GET.get('wd')
+        run = 1
+        match_info = MatchInfo.objects.get(id = match_info_id)
+        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
+        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+        with transaction.atomic():
+            if match_info.first_ins_complete:
+                ba = cal_ball(match_info.second_ins_overs)+1
+                ov = cal_over(ba)
+                match_info.second_ins_runs = match_info.second_ins_runs+run
+                match_info.second_ins_extra_runs = match_info.second_ins_extra_runs+run
+                match_info.secondins_overs = ov
+                match_info.second_ins_crr = round((match_info.second_ins_runs+run)/ov,2)
+                if is_wd == "Wd":
+                    match_info.second_ins_extra_wd = match_info.second_ins_extra_wd+run
+                else:
+                    match_info.second_ins_extra_nb = match_info.second_ins_extra_nb+run
+                match_info.save()
+            else:
+                ba = cal_ball(match_info.first_ins_overs)+1
+                ov = cal_over(ba)
+                match_info.first_ins_runs = match_info.first_ins_runs+run
+                match_info.first_ins_extra_runs = match_info.first_ins_extra_runs+run
+                match_info.first_ins_overs = ov
+                match_info.first_ins_crr = round((match_info.first_ins_runs+run)/ov,2)
+                if is_wd == "Wd":
+                    match_info.first_ins_extra_wd = match_info.first_ins_extra_wd+run
+                else:
+                    match_info.first_ins_extra_nb = match_info.first_ins_extra_nb+run
+                match_info.save()
+
+            #bowler update 
+
+            bowler__player = bowler[0]
+            bba = cal_ball(bowler__player.bowl_over)
+            bov = cal_over(bba)
+            eco = (bowler__player.bowl_runs)/bov
+            bowler__player.bowl_runs=bowler__player.bowl_runs+run
+            bowler__player.bowl_economy=round(eco,2)
+            bowler__player.save()
+
+            od = OverDetails.objects.filter(over_status = True,matchinfo = match_info_id,player = bowler__player.player.id).first()
+            if is_wd =="Wd":
+                od.over_run_wd = od.over_run_wd+run
+            else:
+                od.over_run_nb = od.over_run_wd+run
+            od.over_runs = od.over_runs+run
+            od.save()
+            #check over end
+            
+            player = Players.objects.filter(id__in=batter.values('player'))
+            player_bowl = Players.objects.filter(id__in=bowler.values('player'))
+            score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
+            bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
+            playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
+            playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
+            squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player'))
+            squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player'))
+
+            data={
+            "message":"success",
+            "status":True,
+            "players":PlayerImageSerializer(player,many=True).data,
+            "score":BatScoreSerializer(score,many=True).data,
+
+            "player_bowl":PlayerImageSerializer(player_bowl,many=True).data,
+            "bowl_score":BowlScoreSerializer(bowl_score,many=True).data,
+
+            "squardA":PlayerSquardScoreSerializer(squardA,many=True).data,
+            "squardB":PlayerSquardScoreSerializer(squardB,many=True).data,
+            "matchinfo":MatchinfoSerializer(match_info).data,
+            "over_details":OverDetailsSerializer(OverDetails.objects.filter(matchinfo = match_info_id,player = bowler__player.player.id).order_by('-created_at'),many=True).data
+            }
+            return Response(data,status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
+        data={
+            "message":e,
+            "status":False,
+            }
+        return Response(data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated],)
+def fetch_wicket_player(request):
+    try:
+        match_info_id = request.GET.get('match_info')
+        match_info = MatchInfo.objects.get(id = match_info_id)
+        if match_info.first_ins_complete:
+            player  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",player__in = Players.objects.filter(team= match_info.second_ins.id).values('id'))
+            data={
+                "message":"success",
+                "status":True,
+                "objs":WicketPlayerSerializer(player,many=True).data
+                }
+            return Response(data,status=status.HTTP_200_OK)
+
+        else:
+            player  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",player__in = Players.objects.filter(team= match_info.first_ins.id).values('id'))
+            data={
+                "message":"success",
+                "status":True,
+                "objs":WicketPlayerSerializer(player,many=True).data
+                }
+            return Response(data,status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
+        data={
+            "message":e,
+            "status":False,
+            }
+        return Response(data,status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated],)
+def ajax_update_player_wicket(request):
+    try:
+        match_info_id = request.GET.get('match_info')
+        player_score_id = request.GET.get('player_score_id')
+        is_run_out = request.GET.get('is_run_out')
+        wicket_is_run = request.GET.get('wicket_is_run')
+        if wicket_is_run == "True":
+            run = int(request.GET.get('wicket_hit_run'))
+        else:
+            run = int(request.GET.get('wicket_extra_runs'))
+            wicket_is_leg_bye = request.GET.get('wicket_is_leg_bye')
 
 
+        match_info = MatchInfo.objects.get(id = match_info_id)
+        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
+        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+
+        with transaction.atomic():
+            if batter[0].bat_is_striker:
+                stricker= batter[0]
+                non_stricker = batter[1]
+            else:
+                stricker= batter[1]
+                non_stricker = batter[0]
+
+            if match_info.first_ins_complete:
+                if wicket_is_run == "True":
+                    ba = cal_ball(match_info.second_ins_overs)+1
+                    ov = cal_over(ba)
+                    match_info.second_ins_runs = match_info.second_ins_runs+run
+                    match_info.second_ins_overs = ov
+                    match_info.second_ins_crr = round((match_info.second_ins_runs+run)/ov,2)
+                    match_info.second_ins_wkts = match_info.second_ins_wkts+1
+                    match_info.save()
+                else:
+                    if wicket_is_leg_bye == "True":
+                        ba = cal_ball(match_info.second_ins_overs)+1
+                        ov = cal_over(ba)
+                        match_info.second_ins_runs = match_info.second_ins_runs+run
+                        match_info.second_ins_overs = ov
+                        match_info.second_ins_crr = round((match_info.second_ins_runs+run)/ov,2)
+                        match_info.second_ins_wkts = match_info.second_ins_wkts+1
+                        match_info.save()
+                    else:
+                        ba = cal_ball(match_info.second_ins_overs)
+                        ov = cal_over(ba)
+                        match_info.second_ins_runs = match_info.second_ins_runs+run
+                        match_info.second_ins_overs = ov
+                        match_info.second_ins_crr = round((match_info.second_ins_runs+run)/ov,2)
+                        match_info.second_ins_wkts = match_info.second_ins_wkts+1
+                        match_info.save()
+            else:
+                if wicket_is_run == "True":
+                    ba = cal_ball(match_info.first_ins_overs)+1
+                    ov = cal_over(ba)
+                    match_info.first_ins_runs = match_info.first_ins_runs+run
+                    match_info.first_ins_overs = ov
+                    match_info.first_ins_crr = round((match_info.first_ins_runs+run)/ov,2)
+                    match_info.first_ins_wkts = match_info.first_ins_wkts+1
+                    match_info.save()
+                else:
+                    if wicket_is_leg_bye == "True":
+                        ba = cal_ball(match_info.first_ins_overs)+1
+                        ov = cal_over(ba)
+                        match_info.first_ins_runs = match_info.first_ins_runs+run
+                        match_info.first_ins_overs = ov
+                        match_info.first_ins_crr = round((match_info.first_ins_runs+run)/ov,2)
+                        match_info.first_ins_wkts = match_info.first_ins_wkts+1
+                        match_info.save()
+                    else:
+                        ba = cal_ball(match_info.first_ins_overs)
+                        ov = cal_over(ba)
+                        match_info.first_ins_runs = match_info.first_ins_runs+run
+                        match_info.first_ins_overs = ov
+                        match_info.first_ins_crr = round((match_info.first_ins_runs+run)/ov,2)
+                        match_info.first_ins_wkts = match_info.first_ins_wkts+1
+                        match_info.save()
+
+
+            if run%2 == 0:
+                if wicket_is_run == "True":
+                    stricker.bat_runs = stricker.bat_runs+run
+                    stricker.bat_balls= stricker.bat_balls+1 
+                    stricker.bat_strike_rate = round(((stricker.bat_runs+run)/(stricker.bat_balls+1))*100,2)
+                    stricker.save()
+                else:
+                    if wicket_is_leg_bye == "True":
+                        stricker.bat_runs = stricker.bat_runs
+                        stricker.bat_balls= stricker.bat_balls+1 
+                        stricker.bat_strike_rate = round(((stricker.bat_runs+run)/(stricker.bat_balls+1))*100,2)
+                        stricker.save()
+                    else:
+                        stricker.bat_runs = stricker.bat_runs
+                        stricker.bat_balls= stricker.bat_balls
+                        stricker.save()
+            else:
+                if wicket_is_run == "True":
+                    stricker.bat_runs = stricker.bat_runs+run
+                    stricker.bat_balls= stricker.bat_balls+1 
+                    stricker.bat_strike_rate = round(((stricker.bat_runs+run)/(stricker.bat_balls+1))*100,2)
+                    stricker.bat_is_striker = False
+                    stricker.save()
+                    non_stricker.bat_is_striker = True
+                    non_stricker.save()
+                else:
+                    if wicket_is_leg_bye == "True":
+                        stricker.bat_runs = stricker.bat_runs
+                        stricker.bat_balls= stricker.bat_balls+1 
+                        stricker.bat_strike_rate = round(((stricker.bat_runs+run)/(stricker.bat_balls+1))*100,2)
+                        stricker.bat_is_striker = False
+                        stricker.save()
+                        non_stricker.bat_is_striker = True
+                        non_stricker.save()
+                    else:
+                        stricker.bat_runs = stricker.bat_runs
+                        stricker.bat_balls= stricker.bat_balls
+                        stricker.bat_is_striker = False
+                        stricker.save()
+                        non_stricker.bat_is_striker = True
+                        non_stricker.save()
+
+            bowler__player = bowler[0]
+            if wicket_is_run == "True":
+                bba = cal_ball(bowler__player.bowl_over)+1
+                bov = cal_over(bba)
+                eco = (bowler__player.bowl_runs+run)/bov
+                bowler__player.bowl_runs=bowler__player.bowl_runs+run
+                bowler__player.bowl_over=bov
+                bowler__player.bowl_economy=round(eco,2)
+            else:
+                if wicket_is_leg_bye == "True":
+                    bba = cal_ball(bowler__player.bowl_over)+1
+                    bov = cal_over(bba)
+                    eco = (bowler__player.bowl_runs+run)/bov
+                    bowler__player.bowl_runs=bowler__player.bowl_runs
+                    bowler__player.bowl_over=bov
+                    bowler__player.bowl_economy=round(eco,2)
+                else:
+                    bba = cal_ball(bowler__player.bowl_over)
+                    bov = cal_over(bba)
+                    eco = (bowler__player.bowl_runs+run)/bov
+                    bowler__player.bowl_runs=bowler__player.bowl_runs
+                    bowler__player.bowl_over=bov
+                    bowler__player.bowl_economy=round(eco,2)
+            if is_run_out == "False":
+                bowler__player.bowl_wicket=bowler__player.bowl_wicket+1
+            bowler__player.save()
+            
+
+            od = OverDetails.objects.filter(over_status = True,matchinfo = match_info_id,player = bowler__player.player.id).first()
+            if od.ball_count == 0:
+                if wicket_is_run == "True":
+                    od.over_runs = od.over_runs + run
+                    od.ball_count = od.ball_count + 1
+                    od.over_ball_one = run
+                    od.over_wicket = od.over_wicket+1
+                else:
+                    if wicket_is_leg_bye == "True":
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count + 1
+                        od.over_wicket = od.over_wicket+1
+                    else:
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count
+                        od.over_wicket = od.over_wicket+1
+                od.save()
+            elif od.ball_count == 1:
+                if wicket_is_run == "True" :
+                    od.over_runs = od.over_runs + run
+                    od.ball_count = od.ball_count + 1
+                    od.over_ball_two = run
+                    od.over_wicket = od.over_wicket+1
+                else:
+                    if wicket_is_leg_bye == "True":
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count + 1
+                        od.over_wicket = od.over_wicket+1
+                    else:
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count
+                        od.over_wicket = od.over_wicket+1
+                od.save()
+            elif od.ball_count == 2:
+                if wicket_is_run == "True":
+                    od.over_runs = od.over_runs + run
+                    od.ball_count = od.ball_count + 1
+                    od.over_ball_three = run
+                    od.over_wicket = od.over_wicket+1
+                else:
+                    if wicket_is_leg_bye == "True":
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count + 1
+                        od.over_wicket = od.over_wicket+1
+                    else:
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count
+                        od.over_wicket = od.over_wicket+1
+                od.save()
+            elif od.ball_count == 3:
+                if wicket_is_run == "True":
+                    od.over_runs = od.over_runs + run
+                    od.ball_count = od.ball_count + 1
+                    od.over_ball_four = run
+                    od.over_wicket = od.over_wicket+1
+                else:
+                    if wicket_is_leg_bye == "True":
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count + 1
+                        od.over_wicket = od.over_wicket+1
+                    else:
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count
+                        od.over_wicket = od.over_wicket+1
+                od.save()
+            elif od.ball_count == 4:
+                if wicket_is_run == "True":
+                    od.over_runs = od.over_runs + run
+                    od.ball_count = od.ball_count + 1
+                    od.over_ball_five = run
+                    od.over_wicket = od.over_wicket+1
+                else:
+                    if wicket_is_leg_bye:
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count + 1
+                        od.over_wicket = od.over_wicket+1
+                    else:
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count
+                        od.over_wicket = od.over_wicket+1
+                od.save()
+            elif od.ball_count == 5:
+                if wicket_is_run == "True":
+                    od.over_runs = od.over_runs + run
+                    od.ball_count = od.ball_count + 1
+                    od.over_ball_six = run
+                    od.over_wicket = od.over_wicket+1
+                else:
+                    if wicket_is_leg_bye == "True":
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count + 1
+                        od.over_wicket = od.over_wicket+1
+                    else:
+                        od.over_runs = od.over_runs + run
+                        od.ball_count = od.ball_count
+                        od.over_wicket = od.over_wicket+1
+                od.save()
+            elif od.ball_count == 6:
+                od.over_status = False
+                od.over_wicket = od.over_wicket+1
+                od.save()
+            
+            
+            #check over end
+            is_endball = int(str(float(bov)).split('.')[1])
+            if is_endball == 0:
+                if run%2 == 0:
+                    stricker.bat_is_striker = False
+                    stricker.save()
+                    non_stricker.bat_is_striker = True
+                    non_stricker.save()
+                bowler__player.bowl_status="Recent"
+                bowler__player.save()
+                #recent bowler
+                recent_bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status = "Recent").exclude(id = bowler__player.id)
+                if recent_bowler.exists():
+                    rec_bowl = recent_bowler.first()
+                    rec_bowl.bowl_status = "Not Bowling"
+                    rec_bowl.save()
+
+            ## fall of wicket
+            wicket_batter  = PlayerScore.objects.get(id=player_score_id)
+            wicket_batter.bat_status = "Out"
+            wicket_batter.save()
+
+            ## fall wicket details
+            if match_info.first_ins_complete:
+                if is_run_out == "True":
+                    FallWicket.objects.create(matchinfo=match_info,team = match_info.second_ins,run=match_info.second_ins_runs,wicket=match_info.second_ins_wkts,over=match_info.second_ins_overs,run_rate=match_info.second_ins_crr,batter=wicket_batter.player
+                    )
+                else:
+                    FallWicket.objects.create(matchinfo=match_info,team = match_info.second_ins,run=match_info.second_ins_runs,wicket=match_info.second_ins_wkts,over=match_info.second_ins_overs,run_rate=match_info.second_ins_crr,batter=wicket_batter.player,bowler=bowler__player.player
+                    )
+            else:
+                if is_run_out == "True":
+                    FallWicket.objects.create(matchinfo=match_info,team = match_info.first_ins,run=match_info.first_ins_runs,wicket=match_info.first_ins_wkts,over=match_info.first_ins_overs,run_rate=match_info.first_ins_crr,batter=wicket_batter.player
+                    )
+                else:
+                    FallWicket.objects.create(matchinfo=match_info,team = match_info.first_ins,run=match_info.first_ins_runs,wicket=match_info.first_ins_wkts,over=match_info.first_ins_overs,run_rate=match_info.first_ins_crr,batter=wicket_batter.player,bowler=bowler__player.player
+                    )
+
+            player = Players.objects.filter(id__in=batter.values('player'))
+            player_bowl = Players.objects.filter(id__in=bowler.values('player'))
+            score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
+            bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
+            playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
+            playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
+            squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player'))
+            squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player'))
+            data={
+            "message":"success",
+            "status":True,
+            "players":PlayerImageSerializer(player,many=True).data,
+            "score":BatScoreSerializer(score,many=True).data,
+
+            "player_bowl":PlayerImageSerializer(player_bowl,many=True).data,
+            "bowl_score":BowlScoreSerializer(bowl_score,many=True).data,
+
+            "squardA":PlayerSquardScoreSerializer(squardA,many=True).data,
+            "squardB":PlayerSquardScoreSerializer(squardB,many=True).data,
+            "matchinfo":MatchinfoSerializer(match_info).data,
+            "over_details":OverDetailsSerializer(OverDetails.objects.filter(matchinfo = match_info_id,player = bowler__player.player.id),many=True).data
+            }
+            return Response(data,status=status.HTTP_200_OK)
+        
+
+    except Exception as e:
+        print(e)
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
+        data={
+            "message":e,
+            "status":False,
+            }
+        return Response(data,status=status.HTTP_200_OK)

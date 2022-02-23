@@ -18403,7 +18403,7 @@ h6, .h6 {
 
 .footer .footer-bottom {
   background: rgba(255, 255, 255, 0.07);
-  padding: 30px 0;
+  padding: 10px 0;
   border-top: 1px solid rgba(151, 151, 151, 0.07);
 }
 
@@ -18426,7 +18426,7 @@ h6, .h6 {
 
 .navbar {
   width: 100%;
-  padding: 1.875rem 1rem;
+  /* padding: 1.875rem 1rem; */
   background: #3c37f1;
 }
 

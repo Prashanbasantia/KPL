@@ -4,29 +4,6 @@
 {% block main_content %}
 
 <main class="app-content">
-  <div class="app-title">
-    <div>
-      <ul class="app-breadcrumb breadcrumb">
-        <li class="breadcrumb-item active"><a href="{{players}}"><i class="fa fa-dashboard"></i> Players</a></li>
-      </ul>
-    </div>
-    <ul class="app-breadcrumb breadcrumb">
-      <li class="breadcrumb-item active">
-
-      </li>
-      </li>
-    </ul>
-
-      <div class="modal" id="loader_modal">
-        <div class="modal-dialog modal-sm modal-center" role="document">
-          <div class="modal-content">
-            <div class="spinner-grow text-secondary" role="status">
-              <span class="sr-only">Loading...</span>
-            </div>
-          </div>
-        </div>
-      </div>
-  </div>
 
     <div class="row">
       <div class="col-lg-6">
@@ -64,6 +41,7 @@
       </div>
       <!-- endbowl -->
     </div>
+    
 </main>
 {% endblock main_content %}
 
@@ -73,7 +51,8 @@
 <script type="text/javascript">
   var BASEURL = "http://127.0.0.1:8008"
   ///// RUN COUNTER
-  function update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo) {
+  function update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo,over_details) {
+    console.log(over_details)
     // ####### Bolrwe player
 
     if (player.length == 1) {
@@ -87,7 +66,7 @@
       modal += '<span class="ml-2"> (' + score[0]["bat_runs"] + '/' + score[0]["bat_balls"] + ')</span> </h6>'
       modal += '</div>'
       modal += '<div class="col-6">'
-      modal += '<img src="' + BASEURL + player[0]["image"] + '" class="img-thumbnail" alt="logo">'
+      modal += '<img src="' + BASEURL + player[0]["image"] + '" class="img-thumbnail"  width="80px" height="80px" alt="logo">'
       modal += '</div>'
       modal += '<div class="col-6">'
       modal += '<span class="badge badge-secondary mr-2">SR</span> ' + score[0]["bat_strike_rate"] + '<br>'
@@ -118,12 +97,12 @@
       modal += '<span class="ml-2"> (' + score[0]["bat_runs"] + '/' + score[0]["bat_balls"] + ')</span> </h6>'
       modal += '</div>'
       modal += '<div class="col-6">'
-      modal += '<img src="' + BASEURL + player[0]["image"] + '" class="img-thumbnail" alt="logo">'
+      modal += '<img src="' + BASEURL + player[0]["image"] + '" class="img-thumbnail"  width="80px" height="80px" alt="logo">'
       modal += '</div>'
       modal += '<div class="col-6">'
       modal += '<span class="badge badge-secondary mr-2">SR</span> ' + score[0]["bat_strike_rate"] + '<br>'
       modal += '<span class="badge badge-primary mr-2">4s</span> ' + score[0]["bat_fours"] + '<br>'
-      modal += '<span class="badge badge-danger mr-2">6s</span> ' + score[0]["bat_sixes"] + '<br>                '
+      modal += '<span class="badge badge-danger mr-2">6s</span> ' + score[0]["bat_sixes"] + '<br> '
       modal += '</div>'
       modal += '</div>'
 
@@ -141,12 +120,12 @@
       modal2 += '<span class="ml-2"> (' + score[1]["bat_runs"] + '/' + score[1]["bat_balls"] + ')</span> </h6>'
       modal2 += '</div>'
       modal2 += '<div class="col-6">'
-      modal2 += '<img src="' + BASEURL + player[1]["image"] + '" class="img-thumbnail" alt="logo">'
+      modal2 += '<img src="' + BASEURL + player[1]["image"] + '" class="img-thumbnail" width="80px" height="80px" alt="logo">'
       modal2 += '</div>'
       modal2 += '<div class="col-6">'
       modal2 += '<span class="badge badge-secondary mr-2">SR</span> ' + score[1]["bat_strike_rate"] + '<br>'
       modal2 += '<span class="badge badge-primary mr-2">4s</span> ' + score[1]["bat_fours"] + '<br>'
-      modal2 += '<span class="badge badge-danger mr-2">6s</span> ' + score[1]["bat_sixes"] + '<br>                '
+      modal2 += '<span class="badge badge-danger mr-2">6s</span> ' + score[1]["bat_sixes"] + '<br>'
       modal2 += '</div>'
       modal2 += '</div>'
 
@@ -164,7 +143,7 @@
       $('#batone').append(t1)
 
       var t2 = ""
-      t2 += '<div class="batone_head">'
+      t2 += '<div class="battwo_head">'
       t2 += '<h6 class="">Add Batsman  '
       t2 += '<button class="float-right btn btn-outline-info btn-sm" type="button" id="Add_batter_two"><i class="fa fa-plus" aria-hidden="true"></i></button></h6>'
       t2 += '</div>'
@@ -178,49 +157,120 @@
 
       var modal = ""
       modal += '<div class="row" >'
-      modal += '<div class="col-6">'
-      modal += '<div class="row">'
-      modal += '<div class="col-12 mb-2 border-bottom  border-primary">'
-      modal += '<h6 class="">' + player_bowl[0]["name"] + ''
-      modal += '<span class="ml-2"> (' + bowl_score[0]["bowl_over"] + '/' + bowl_score[0]["bowl_wicket"] + ')</span> </h6>'
-      modal += '</div>'
-      modal += '<div class="col-6">'
-      modal += '<img src="' + BASEURL + player_bowl[0]["image"] + '" class="img-thumbnail" alt="logo">'
-      modal += '</div>'
-      modal += '<div class="col-6">'
-      modal += '<span class="badge badge-secondary mr-2">Eco</span> ' + bowl_score[0]["bowl_economy"] + ' <br>'
-      modal += '<span class="badge badge-primary mr-2">Runs</span> ' + bowl_score[0]["bowl_runs"] + ' <br>'
-      modal += '</div>'
-      modal += '</div>'
-      modal += '</div>'
+        modal += '<div class="col-sm-6">'
+          modal += '<div class="row">'
 
-      modal += '<div class="col-6  pr-2 border-left  border-primary">'
-      modal += '<div class="">'
-      modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="run0" value="0" >0</button> '
-      modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="run1" value="1" >1</button>  '
-      modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="run2" value="2" >2</button>  '
-      modal += '<button class="event_btn btn btn-outline-secondary btn-sm ml-2" id="run3" value="3" >3</button>'
-      modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="run4" value="4" >4</button>'
-      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="run6" value="6" >6</button> '
-      modal += '</div>'
+            modal += '<div class="col-12 mb-2 border-bottom  border-primary">'
+            modal += '<h6 class="">' + player_bowl[0]["name"] + ''
+            modal += '<span class="ml-2"> (' + bowl_score[0]["bowl_over"] + '/' + bowl_score[0]["bowl_wicket"] + ')</span> </h6>'
+            modal += '</div>'
 
-      modal += '<div class="mt-4">'
-      modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="bye1">B1</button> '
-      modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="bye2">B2</button> '
-      modal += '<button class="event_btn btn btn-outline-secondary btn-sm ml-2" id="bye3">B3</button> '
-      modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="bye4">B4</button> '
-      modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="bye5">B5</button> '
-      modal += '</div>'
+            modal += '<div class="col-6">'
+            modal += '<img src="' + BASEURL + player_bowl[0]["image"] + '" class="img-thumbnail" width="80px" height="80px" alt="logo">'
+            modal += '</div>'
+            
+            modal += '<div class="col-6">'
+            modal += '<span class="badge badge-secondary mr-2">Eco</span> ' + bowl_score[0]["bowl_economy"] + ' <br>'
+            modal += '<span class="badge badge-primary mr-2">Runs</span> ' + bowl_score[0]["bowl_runs"] + ' <br>'
+            modal += '</div>'
 
-      modal += '<div class="mt-4">'
-      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="wide" >Wd</button> '
-      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="noball" >NB</button> '
-      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="wicket" >Wicket</button>'
-      modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="reverserun" >--</button> '
-      modal += '</div>'
+            //over details
+
+            modal += '<div class="col-sm-12">'
+              modal += '<div class="table-responsive">'
+              modal += '<table class="table table-sm table-bordered table-dark">'
+                modal += '<thead>'
+                  modal += '<tr>'
+                    modal += '<th>O</th>'
+                    modal += '<th>Balls</th>'
+                    modal += '<th>Wd</th>'
+                    modal += '<th>Nb</th>'
+                    modal += '<th>Ex</th>'
+                    modal += '<th>W</th>'
+                    modal += '<th>R</th>'
+                  modal += '</tr>'
+                modal += '</thead>'
+                modal += '<tbody>'
+                  over_details.forEach(function (item,inx) {
+                  modal += '<tr>'
+                   modal += ' <td>'+ parseInt(inx+1)+'</td>'
+                  
+
+                     if(item['ball_count'] === 1){
+                      modal += '<td> [ '+ item["over_ball_one"] + ' ]</td>' 
+                     }
+                     else if(item['ball_count'] == 2){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+' ]</td>' 
+                    }
+                    else if(item['ball_count'] == 3){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+', '+item["over_ball_three"]+' ]</td>' 
+                    }
+                    else if(item['ball_count'] == 4){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+', '+item["over_ball_three"]+', '+item["over_ball_four"]+' ]</td>'
+                    }
+                    else if(item['ball_count'] == 5){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+', '+item["over_ball_three"]+', '+item["over_ball_four"]+', '+item["over_ball_five"]+' ]</td>'
+                    }
+                    else if(item['ball_count'] == 6){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+', '+item["over_ball_three"]+', '+item["over_ball_four"]+', '+item["over_ball_five"]+','+item["over_ball_six"]+' ]</td>'
+                    }
+                    else{
+                      modal += '<td> [ ]</td>' 
+
+                    }
+                    
+                   
+                    modal += '<td>'+ item['over_run_wd']+'</td>'
+                    modal += '<td>'+ item['over_run_nb']+'</td>'
+                    modal += '<td>'+ item['over_run_bye']+'</td>'
+                    modal += '<td>'+ item['over_wicket']+'</td>'
+                    modal += '<td>'+ item['over_runs']+'</td>'
+                  modal += '</tr>'
+                   })
+                modal += '</tbody>'
+              modal += '</table>'
+              modal += '</div>'
+            modal += '</div>'
+
+
+          modal += '</div>'
+        modal += '</div>'
+
+      modal += '<div class="col-sm-6  p-2 mt-2 border border-primary">'
+
+        modal += '<div class="">'
+          modal += '<button class="event_btn btn btn-outline-success btn-sm mt-2 ml-2" id="run0" value="0" >0</button> '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" id="run1" value="1" >1</button>  '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" id="run2" value="2" >2</button>  '
+          modal += '<button class="event_btn btn btn-outline-secondary btn-sm mt-2 ml-2" id="run3" value="3" >3</button>'
+          modal += '<button class="event_btn btn btn-outline-success btn-sm mt-2 ml-2" id="run4" value="4" >4</button>'
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" id="run6" value="6" >6</button> '
+        modal += '</div>'
+
+        modal += '<div class="mt-4">'
+          modal += '<div class="animated-checkbox ml-2 mt-2">'
+            modal += '<label>'
+              modal += '<input type="checkbox" name="is_leg_bye" value="True"><span class="label-text">Is Leg bye </span>'
+            modal += '</label>'
+          modal += '</div>'
+          modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="1" id="extra1">E1</button> '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="2" id="extra2">E2</button> '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="3" id="extra3">E3</button> '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="4" id="extra4">E4</button> '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="5" id="extra5">E5</button> '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="6" id="extra6">E6</button> '
+          modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="7" id="extra7">E7</button> '
+        modal += '</div>'
+
+        modal += '<div class="mt-4 mb-2">'
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wd" id="wide" >Wd</button> '
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="NB" id="noball" >NB</button> '
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wicket" id="wicket" >Wicket</button>'
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="--" id="reverserun" >--</button> '
+        modal += '</div>'
 
       modal += '</div>'
-      modal += '</div>'
+    modal += '</div>'
       $(".bowl_head").remove()
       $("#bowl").empty()
       $('#bowl').append(modal)
@@ -243,34 +293,87 @@
 
     var sc = "";
     sc += '<div id="score_card">'
-    sc += '<h5 class="float-left">Score</h5><small class="float-right"><i><b>' + matchinfo["toss_own"] + '</b></i> Own The Toss And <i><b>' + matchinfo["toss_own_options"] + '</b></i></small>'
+    sc += '<h5 class="float-left">Score</h5><small class="float-right"><i><b>' + matchinfo["toss_own"] + '</b></i> Won The Toss And <i><b>' + matchinfo["toss_own_options"] + '</b></i></small>'
     sc += '<div class="clearfix" ></div>'
     sc += '<div style="display: flex;justify-content: space-between;">'
     sc += '<div> '
     sc += '<i class=""><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i><br>'
-    sc += '<i class="">CRR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i><br>'
+    sc += '<i class="">CRR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i><br> <i class="">Extras<span class="ml-1">' + matchinfo["first_ins_extra_runs"] + ' (wd-'+matchinfo["first_ins_extra_wd"] +', nb-'+ matchinfo["first_ins_extra_nb"]+', b-'+matchinfo["first_ins_extra_bye"] +')</span></i> <br>'
     sc += '</div>'
     sc += '<div>'
     if (matchinfo["first_ins_complete"]) {
       sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b> <strong> ' + matchinfo["second_ins_runs"] + ' / ' + matchinfo["second_ins_wkts"] + ' (' + matchinfo["second_ins_overs"] + ')</strong></i><br>'
-      sc += '<i class="">CRR<span class="ml-1">' + matchinfo["second_ins_crr"] + '</span></i> <br>'
+      sc += '<i class="">CRR<span class="ml-1">' + matchinfo["second_ins_crr"] + '</span></i> <br> <i class="">Extras<span class="ml-1">' + matchinfo["second_ins_extra_runs"] + ' (wd-'+matchinfo["second_ins_extra_wd"] +', nb-'+ matchinfo["second_ins_extra_nb"]+', b-'+matchinfo["second_ins_extra_bye"] +')</span></i> <br>'
     } else {
       sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b></i></br>'
     }
 
     sc += '</div>'
     sc += '</div>'
-    sc += '<center><h6 class="text-primary">Playing Squard</h6></center>'
-    sc += '<div style="display: flex;justify-content: space-between;">'
+   
+    sc += '<div style="display: flex;flex-direction:column">'
     sc += '<div> '
-    squardA.forEach(function (item) {
-      sc += '<strong class="mr-2"><i class=""><b>' + item["player"]["name"] + '</b></i></strong>  ' + item["bat_runs"] + '/' + item["bat_balls"] + ' - (' + item["bowl_over"] + '/' + item["bowl_wicket"] + ')<br>'
-    })
+      sc += '<center><h6 class="text-primary mt-2">Playing Squard ' + matchinfo["first_ins"]['name'] + '</h6></center>'
+      sc += '<table class="table table-sm table-bordered">'
+        sc += '<thead>'
+          sc += '<tr>'
+            sc += '<th>Player</th>'
+            sc += '<th>R</th>'
+            sc += '<th>B</th>'
+            sc += '<th>Sr</th>'
+            sc += '<th>Ov</th>'
+            sc += '<th>Wc</th>'
+            sc += '<th>Rc</th>'
+            sc += '<th>Eco</th>'
+          sc += '</tr>'
+        sc += '</thead>'
+        sc += '<tbody>'
+          squardA.forEach(function (item) {
+          sc += '<tr>'
+            sc += '<td> '+item["player"]["name"]+' </td>'
+            sc += '<td> '+item["bat_runs"]+' </td>'
+            sc += '<td> '+item["bat_balls"]+' </td>'
+            sc += '<td> '+item["bat_strike_rate"]+' </td>'
+            sc += '<td> '+item["bowl_over"]+' </td>'
+            sc += '<td> '+item["bowl_wicket"]+' </td>'
+            sc += '<td> '+item["bowl_runs"]+' </td>'
+            sc += '<td> '+item["bowl_economy"]+' </td>'
+          sc += '</tr>'
+        })
+        sc += '</tbody>'
+      sc += '</table>'
+
     sc += '</div>'
     sc += '<div>'
-    squardB.forEach(function (item) {
-      sc += '<strong class="mr-2"><i class=""><b>' + item["player"]["name"] + '</b></i></strong>  ' + item["bat_runs"] + '/' + item["bat_balls"] + ' - (' + item["bowl_over"] + '/' + item["bowl_wicket"] + ')<br>'
-    })
+      sc += '<center><h6 class="text-primary mt-2">Playing Squard ' + matchinfo["second_ins"]['name'] + '</h6></center>'
+      sc += '<table class="table table-sm table-bordered">'
+        sc += '<thead>'
+          sc += '<tr>'
+            sc += '<th>Player</th>'
+            sc += '<th>R</th>'
+            sc += '<th>B</th>'
+            sc += '<th>Sr</th>'
+            sc += '<th>Ov</th>'
+            sc += '<th>Wc</th>'
+            sc += '<th>Rc</th>'
+            sc += '<th>Eco</th>'
+          sc += '</tr>'
+        sc += '</thead>'
+        sc += '<tbody>'
+          squardB.forEach(function (item) {
+          sc += '<tr>'
+            sc += '<td> '+item["player"]["name"]+' </td>'
+            sc += '<td> '+item["bat_runs"]+' </td>'
+            sc += '<td> '+item["bat_balls"]+' </td>'
+            sc += '<td> '+item["bat_strike_rate"]+' </td>'
+            sc += '<td> '+item["bowl_over"]+' </td>'
+            sc += '<td> '+item["bowl_wicket"]+' </td>'
+            sc += '<td> '+item["bowl_runs"]+' </td>'
+            sc += '<td> '+item["bowl_economy"]+' </td>'
+          sc += '</tr>'
+        })
+        sc += '</tbody>'
+      sc += '</table>'
     sc += '</div>'
     sc += '</div>'
     sc += '</div>'
@@ -298,7 +401,8 @@
           var squardA = result["squardA"]
           var squardB = result["squardB"]
           var matchinfo = result["matchinfo"]
-          update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo)
+          var over_details = result["over_details"]
+          update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo,over_details)
 
         }
         else {
@@ -464,7 +568,7 @@
             modal += '<span class="ml-2"> (' + score["bat_runs"] + '/' + score["bat_balls"] + ')</span> </h6>'
             modal += '</div>'
             modal += '<div class="col-6">'
-            modal += '<img src="' + BASEURL + player["image"] + '" class="img-thumbnail" alt="logo">'
+            modal += '<img src="' + BASEURL + player["image"] + '" class="img-thumbnail" width="80px" height="80px" alt="logo">'
             modal += '</div>'
             modal += '<div class="col-6">'
             modal += '<span class="badge badge-secondary mr-2">SR</span> ' + score["bat_strike_rate"] + '<br>'
@@ -489,7 +593,6 @@
     }
 
   });
-
 
   $(document).on("click", "#add_batter_two_btn", function () {
 
@@ -519,12 +622,12 @@
             modal += '<span class="ml-2"> (' + score["bat_runs"] + '/' + score["bat_balls"] + ')</span> </h6>'
             modal += '</div>'
             modal += '<div class="col-6">'
-            modal += '<img src="' + BASEURL + player["image"] + '" class="img-thumbnail" alt="logo">'
+            modal += '<img src="' + BASEURL + player["image"] + '" class="img-thumbnail" width="80px" height="80px" alt="logo">'
             modal += '</div>'
             modal += '<div class="col-6">'
             modal += '<span class="badge badge-secondary mr-2">SR</span> ' + score["bat_strike_rate"] + '<br>'
             modal += '<span class="badge badge-primary mr-2">4s</span> ' + score["bat_fours"] + '<br>'
-            modal += '<span class="badge badge-danger mr-2">6s</span> ' + score["bat_sixes"] + '<br>                '
+            modal += '<span class="badge badge-danger mr-2">6s</span> ' + score["bat_sixes"] + '<br>'
             modal += '</div>'
             modal += '</div>'
 
@@ -600,6 +703,7 @@
 
   });
 
+
   $(document).on("click", "#Add_bowler_btn", function () {
     var bowler_id = $("input[name='bowler_id']:checked").val()
     $.ajax({
@@ -614,52 +718,119 @@
           var player = result["players"]
           var score = result["score"]
           var modal = ""
-          modal += '<div class="row">'
-          modal += '<div class="col-6">'
-          modal += '<div class="row">'
-          modal += '<div class="col-12 mb-2 border-bottom  border-primary">'
-          modal += '<h6 class="">' + player["name"] + ''
-          modal += '<span class="ml-2"> (' + score["bowl_over"] + '/' + score["bowl_wicket"] + ')</span> </h6>'
-          modal += '</div>'
-          modal += '<div class="col-6">'
-          modal += '<img src="' + BASEURL + player["image"] + '" class="img-thumbnail" alt="logo">'
-          modal += '</div>'
-          modal += '<div class="col-6">'
-          modal += '<span class="badge badge-secondary mr-2">Eco</span> ' + score["bowl_economy"] + ' <br>'
-          modal += '<span class="badge badge-primary mr-2">Runs</span> ' + score["bowl_runs"] + ' <br>'
-          modal += '</div>'
-          modal += '</div>'
-          modal += '</div>'
-
-          modal += '<div class="col-6  pr-2 border-left  border-primary">'
-          modal += '<div class="">'
-          modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="run0" value="0" >0</button> '
-          modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="run1" value="1" >1</button>  '
-          modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="run2" value="2" >2</button>  '
-          modal += '<button class="event_btn btn btn-outline-secondary btn-sm ml-2" id="run3" value="3" >3</button>'
-          modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="run4" value="4" >4</button>'
-          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="run6" value="6" >6</button> '
-          modal += '</div>'
+          modal += '<div class="row" >'
+            modal += '<div class="col-sm-6">'
+              modal += '<div class="row">'
     
-          modal += '<div class="mt-4">'
-          modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="bye1">B1</button> '
-          modal += '<button class="event_btn btn btn-outline-info btn-sm ml-2" id="bye2">B2</button> '
-          modal += '<button class="event_btn btn btn-outline-secondary btn-sm ml-2" id="bye3">B3</button> '
-          modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="bye4">B4</button> '
-          modal += '<button class="event_btn btn btn-outline-success btn-sm ml-2" id="bye5">B5</button> '
-          modal += '</div>'
+                modal += '<div class="col-12 mb-2 border-bottom  border-primary">'
+                modal += '<h6 class="">' + player["name"] + ''
+                modal += '<span class="ml-2"> (' + score["bowl_over"] + '/' + score["bowl_wicket"] + ')</span> </h6>'
+                modal += '</div>'
     
-          modal += '<div class="mt-4">'
-          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="wide" >Wd</button> '
-          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="noball" >NB</button> '
-          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="wicket" >Wicket</button>'
-          modal += '<button class="event_btn btn btn-outline-danger btn-sm ml-2" id="reverserun" >--</button> '
-          modal += '</div>'
+                modal += '<div class="col-6">'
+                modal += '<img src="' + BASEURL + player["image"] + '" class="img-thumbnail" width="80px" height="80px" alt="logo">'
+                modal += '</div>'
+                
+                modal += '<div class="col-6">'
+                modal += '<span class="badge badge-secondary mr-2">Eco</span> ' + score["bowl_economy"] + ' <br>'
+                modal += '<span class="badge badge-primary mr-2">Runs</span> ' + score["bowl_runs"] + ' <br>'
+                modal += '</div>'
+    
+              modal += '</div>'
+            modal += '</div>'
+    
+          modal += '<div class="col-sm-6  p-2 mt-2 border border-primary">'
+    
+            modal += '<div class="">'
+              modal += '<button class="event_btn btn btn-outline-success btn-sm mt-2 ml-2" id="run0" value="0" >0</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" id="run1" value="1" >1</button>  '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" id="run2" value="2" >2</button>  '
+              modal += '<button class="event_btn btn btn-outline-secondary btn-sm mt-2 ml-2" id="run3" value="3" >3</button>'
+              modal += '<button class="event_btn btn btn-outline-success btn-sm mt-2 ml-2" id="run4" value="4" >4</button>'
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" id="run6" value="6" >6</button> '
+            modal += '</div>'
+    
+            modal += '<div class="mt-4">'
+              modal += '<div class="animated-checkbox ml-2 mt-2">'
+                modal += '<label>'
+                  modal += '<input type="checkbox" name="is_leg_bye" value="True"><span class="label-text">Is Leg bye </span>'
+                modal += '</label>'
+              modal += '</div>'
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="1" id="extra1">E1</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="2" id="extra2">E2</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="3" id="extra3">E3</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="4" id="extra4">E4</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="5" id="extra5">E5</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="6" id="extra6">E6</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="7" id="extra7">E7</button> '
+            modal += '</div>'
+    
+            modal += '<div class="mt-4 mb-2">'
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wd" id="wide" >Wd</button> '
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="NB" id="noball" >NB</button> '
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wicket" id="wicket" >Wicket</button>'
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="--" id="reverserun" >--</button> '
+            modal += '</div>'
+    
+            //over details
 
-          modal += '</div>'
-          modal += '</div>'
+            modal += '<div class="col-sm-12">'
+              modal += '<div class="table-responsive">'
+              modal += '<table class="table table-sm table-bordered table-dark">'
+                modal += '<thead>'
+                  modal += '<tr>'
+                    modal += '<th>O</th>'
+                    modal += '<th>Balls</th>'
+                    modal += '<th>Wd</th>'
+                    modal += '<th>Nb</th>'
+                    modal += '<th>Ex</th>'
+                    modal += '<th>W</th>'
+                    modal += '<th>R</th>'
+                  modal += '</tr>'
+                modal += '</thead>'
+                modal += '<tbody>'
+                  over_details.forEach(function (item,inx) {
+                  modal += '<tr>'
+                   modal += ' <td>'+ parseInt(inx+1)+'</td>'
+                  
 
+                     if(item['ball_count'] === 1){
+                      modal += '<td> [ '+ item["over_ball_one"] + ' ]</td>' 
+                     }
+                     else if(item['ball_count'] == 2){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+' ]</td>' 
+                    }
+                    else if(item['ball_count'] == 3){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+', '+item["over_ball_three"]+' ]</td>' 
+                    }
+                    else if(item['ball_count'] == 4){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+', '+item["over_ball_three"]+', '+item["over_ball_four"]+' ]</td>'
+                    }
+                    else if(item['ball_count'] == 5){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+', '+item["over_ball_three"]+', '+item["over_ball_four"]+', '+item["over_ball_five"]+' ]</td>'
+                    }
+                    else if(item['ball_count'] == 6){
+                      modal += '<td> [ '+item["over_ball_one"]+', '+item["over_ball_two"]+', '+item["over_ball_three"]+', '+item["over_ball_four"]+', '+item["over_ball_five"]+','+item["over_ball_six"]+' ]</td>'
+                    }
+                    else{
+                      modal += '<td> [ ]</td>' 
 
+                    }
+                                       
+                    modal += '<td>'+ item['over_run_wd']+'</td>'
+                    modal += '<td>'+ item['over_run_nb']+'</td>'
+                    modal += '<td>'+ item['over_run_bye']+'</td>'
+                    modal += '<td>'+ item['over_wicket']+'</td>'
+                    modal += '<td>'+ item['over_runs']+'</td>'
+                  modal += '</tr>'
+                   })
+                modal += '</tbody>'
+              modal += '</table>'
+              modal += '</div>'
+            modal += '</div>'
+                   //endbbowler details
+          modal += '</div>'
+        modal += '</div>'
 
           $(".bowl_head").remove()
           $('#bowl').append(modal)
@@ -703,7 +874,8 @@
           var squardA = result["squardA"]
           var squardB = result["squardB"]
           var matchinfo = result["matchinfo"]
-          update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo)
+          var over_details = result["over_details"]
+          update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo,over_details)
 
         }
         else {
@@ -715,7 +887,368 @@
 
   });
 
+  // update extra run
+
+  $(document).on("click", "#extra1,#extra2,#extra3,#extra4,#extra5,#extra6,#extra7", function () {
+    var val =  $(this).val()
+    var is_leg_bye = $("input[name='is_leg_bye']:checked").val()
+    if (is_leg_bye == "True"){  
+      $("input[name='is_leg_bye']").prop('checked',false)
+    }
+    else{
+      is_leg_bye="False"
+    }
+    console.log(val,is_leg_bye)
+    $(this).html('<i class="fa fa-spinner fa-spin" style="font-size:15px;"></i>');
+    $('.event_btn').attr('disabled', true);
+     $.ajax({
+       url: "{% url 'ajax_update_live_extra_runs' %}",
+       type: "GET",
+       data: {
+         "match_info": "{{match_info.id}}","run":val,"is_leg_bye":is_leg_bye
+       },
+       cache: false,
+       success: function (result) {
+         if (result["status"]) {
+           $(this).html(val);
+           $('.event_btn').attr('disabled', false);
+           var player = result["players"]
+           var score = result["score"]
+           var player_bowl = result["player_bowl"]
+           var bowl_score = result["bowl_score"]
+           var squardA = result["squardA"]
+           var squardB = result["squardB"]
+           var matchinfo = result["matchinfo"]
+           var over_details = result["over_details"]
+           update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo,over_details)
  
+         }
+         else {
+           console.log(result["message"])
+         }
+ 
+       }
+     });
+ 
+   });
+ 
+// update wide an NB
+$(document).on("click", "#wide,#noball", function () {
+  var val =  $(this).val()
+  $(this).html('<i class="fa fa-spinner fa-spin" style="font-size:15px;"></i>');
+  $('.event_btn').attr('disabled', true);
+   $.ajax({
+     url: "{% url 'ajax_update_live_wd_runs' %}",
+     type: "GET",
+     data: {
+       "match_info": "{{match_info.id}}","wd":val
+     },
+     cache: false,
+     success: function (result) {
+       if (result["status"]) {
+         $(this).html(val);
+         $('.event_btn').attr('disabled', false);
+         var player = result["players"]
+         var score = result["score"]
+         var player_bowl = result["player_bowl"]
+         var bowl_score = result["bowl_score"]
+         var squardA = result["squardA"]
+         var squardB = result["squardB"]
+         var matchinfo = result["matchinfo"]
+         var over_details = result["over_details"]
+        update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo,over_details)
+
+       }
+       else {
+         console.log(result["message"])
+       }
+
+     }
+   });
+
+ });
+
+ // wicket taking part
+ //wicket fetch
+ $(document).on("click", "#wicket", function () {
+
+  $.ajax({
+    url: "{% url 'fetch_wicket_player' %}",
+    type: "GET",
+    data: {
+      "match_info": "{{match_info.id}}"
+    },
+    cache: false,
+    success: function (result) {
+      if (result["status"]) {
+        var obj = result["objs"]
+        var modal = ""
+        modal += '<div class="modal" id="wicketmodal" >'
+        modal += '<div class="modal-dialog" role="document">'
+        modal += ' <div class="modal-content">'
+        modal += '<div class="modal-header">'
+        modal += '<h5 class="modal-title">Update Wicket</h5>'
+        modal += '<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>'
+        modal += '</div>'
+        modal += '<form >'
+        modal += '<div class="modal-body">'
+
+        modal += '<div class="mt-2  border border-success px-2">'
+          modal += '<p><strong>1.</strong> Choose Player</p>'
+        obj.forEach(function (i) {
+          modal += '<div class="animated-radio-button">'
+          modal += '<label>'
+            if(i['bat_is_striker']){
+          modal += '<input type="radio" name="wicket_player_score_id" id="wicket_player_score_id" checked value="' + i["id"] + '" ><span class="label-text">' + i['player']["name"]+' <sup class="text-danger"><i class="fa fa-star"></i></sup></span>'
+            }else{
+          modal += '<input type="radio" name="wicket_player_score_id" id="wicket_player_score_id" value="' + i["id"] + '" ><span class="label-text">' + i['player']["name"] + '</span>'
+            }
+          modal += '</label>'
+          modal += '</div>'
+        });
+        modal += '<div class="animated-checkbox mt-2">'
+          modal += '<label>'
+            modal += '<input type="checkbox" name="is_run_out" value="True"><span class="label-text">Is Run Out</span>'
+          modal += '</label>'
+        modal += '</div>'
+
+        modal += '</div>'
+
+
+        modal += '<div class="mt-2  border border-success px-2">'
+          modal += '<p><strong>2.</strong> Choose Balls Run Type</p>'
+          modal += '<div class="animated-radio-button">'
+            modal += '<label>'
+            modal += '<input type="radio" name="wicket_is_run" id="wicket_is_run" checked value="True" ><span class="label-text">Is Run'
+            modal += '</label>'
+          modal += '</div>'
+
+          modal += '<div class="animated-radio-button">'
+            modal += '<label>'
+            modal += '<input type="radio" name="wicket_is_run" id="wicket_is_run" value="False" ><span class="label-text">Is Extra Run'
+            modal += '</label>'
+          modal += '</div>'
+        modal += '</div>'
+        //hit run
+        modal += '<div class="mt-2  border border-primary px-2" id="hit_run">'
+          modal += '<p><strong>3.</strong> Choose Hit Run</p>'
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_hit_run" id="inlineRadio0" checked value="0">'
+            modal += '<label class="form-check-label" for="inlineRadio2">0</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_hit_run" id="inlineRadio1" value="1">'
+            modal += '<label class="form-check-label" for="inlineRadio1">1</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_hit_run" id="inlineRadio2" value="option2">'
+            modal += '<label class="form-check-label" for="inlineRadio2">2</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_hit_run" id="inlineRadio3" value="3">'
+            modal += '<label class="form-check-label" for="inlineRadio1">3</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_hit_run" id="inlineRadio4" value="4">'
+            modal += '<label class="form-check-label" for="inlineRadio2">4</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_hit_run" id="inlineRadio6" value="6">'
+            modal += '<label class="form-check-label" for="inlineRadio1">6</label>'
+          modal += '</div>'
+
+        modal += '</div>'
+
+        
+            // wicket extra run
+        modal += '<div class="mt-2 border border-primary px-2 d-none" id="extra_run">'
+          modal += '<p><strong>3.</strong> Choose Extra Run</p>'
+          modal += '<div class="animated-checkbox mt-2">'
+            modal += '<label>'
+              modal += '<input type="checkbox" name="wicket_is_leg_bye" value="True"><span class="label-text">Is Leg bye </span>'
+            modal += '</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_extra_runs" id="inlineRadioe1" checked value="1">'
+            modal += '<label class="form-check-label" for="inlineRadio1">E1</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_extra_runs" id="inlineRadioe2" value="2">'
+            modal += '<label class="form-check-label" for="inlineRadio2">E2</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_extra_runs" id="inlineRadio1e3" value="3">'
+            modal += '<label class="form-check-label" for="inlineRadio1">E3</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_extra_runs" id="inlineRadioe4" value="4">'
+            modal += '<label class="form-check-label" for="inlineRadio2">E4</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_extra_runs" id="inlineRadioe5" value="5">'
+            modal += '<label class="form-check-label" for="inlineRadio2">E5</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_extra_runs" id="inlineRadioe6" value="6">'
+            modal += '<label class="form-check-label" for="inlineRadio2">E6</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="wicket_extra_runs" id="inlineRadioe7" value="7">'
+            modal += '<label class="form-check-label" for="inlineRadio1">E7</label>'
+          modal += '</div>'
+        modal += '</div>'
+
+
+        modal += '</div>'
+        modal += '<div class="modal-footer">'
+        modal += '<button class="btn btn-success" type="button" id="update_wicket_btn">Update</button>'
+        modal += '<button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>'
+        modal += '</div>'
+        modal += '</form>'
+        modal += '</div>'
+        modal += '</div>'
+        modal += '</div>'
+
+        $("#wicketmodal").remove()
+        $('.app-content').append(modal)
+        $("#wicketmodal").modal('show')
+
+      }
+      else {
+        console.log(result["message"])
+
+      }
+
+    }
+
+  });
+
+});
+
+//end wicket fetch
+
+
+// show hide run and extra
+
+//update wicket 
+$(document).on("click", "input[name='wicket_is_run']", function () {
+  var player_score_id = $("input[name='wicket_is_run']:checked").val()
+  if (player_score_id == 'True') {
+    $('#extra_run').addClass('d-none')
+    $('#hit_run').removeClass('d-none')
+   
+  } else {
+
+    $('#extra_run').removeClass('d-none')
+    $('#hit_run').addClass('d-none')
+
+  }
+
+});
+
+
+//update wicket 
+$(document).on("click", "#update_wicket_btn", function () {
+
+  var player_score_id = $("input[name='wicket_player_score_id']:checked").val()
+  var wicket_is_run = $("input[name='wicket_is_run']:checked").val()
+  var is_run_out = $("input[name='is_run_out']:checked").val()
+  console.log('error' ,wicket_is_run)
+  if(is_run_out != "True"){
+    is_run_out = "False"
+
+  }
+
+  if (wicket_is_run == 'True') {
+    var wicket_hit_run = $("input[name='wicket_hit_run']:checked").val()
+    console.log("first block")
+      $.ajax({
+        url: "{% url 'ajax_update_player_wicket' %}",
+        type: "GET",
+        data: {
+          "match_info": "{{match_info.id}}", "player_score_id": player_score_id,'wicket_is_run':wicket_is_run,'wicket_hit_run':wicket_hit_run,"is_run_out":is_run_out
+        },
+        cache: false,
+        success: function (result) {
+          if (result["status"]) {
+            var player = result["players"]
+            var score = result["score"]
+            var player_bowl = result["player_bowl"]
+            var bowl_score = result["bowl_score"]
+            var squardA = result["squardA"]
+            var squardB = result["squardB"]
+            var matchinfo = result["matchinfo"]
+            var over_details = result["over_details"]
+            update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo,over_details)
+            $("#wicketmodal").modal('hide')
+
+            
+          }
+          else {
+            console.log(result["message"])
+          }
+
+        }
+
+      });
+
+  }
+   else {
+
+    console.log("second block")
+
+    var wicket_is_leg_bye = $("input[name='wicket_is_leg_bye']:checked").val()
+    if( wicket_is_leg_bye != "True"){
+      wicket_is_leg_bye = "False"
+    }
+    var wicket_extra_runs = $("input[name='wicket_extra_runs']:checked").val()
+   $.ajax({
+      url: "{% url 'ajax_update_player_wicket' %}",
+      type: "GET",
+      data: {
+        "match_info": "{{match_info.id}}", "player_score_id": player_score_id,"wicket_is_leg_bye":wicket_is_leg_bye,"wicket_extra_runs":wicket_extra_runs,'wicket_is_run':wicket_is_run,"is_run_out":is_run_out
+      },
+      cache: false,
+      success: function (result) {
+        if (result["status"]) {
+          var player = result["players"]
+          var score = result["score"]
+          var player_bowl = result["player_bowl"]
+          var bowl_score = result["bowl_score"]
+          var squardA = result["squardA"]
+          var squardB = result["squardB"]
+          var matchinfo = result["matchinfo"]
+          var over_details = result["over_details"]
+          update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo,over_details)
+          $("#wicketmodal").modal('hide')
+
+
+        }
+        else {
+          console.log(result["message"])
+        }
+
+      }
+
+    });
+
+  }
+    
+
+
+});
 
 </script>
 {% endblock js %}

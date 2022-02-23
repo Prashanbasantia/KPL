@@ -5,26 +5,26 @@
 		<!-- Required meta tags --> 
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<title>Marshmallow Bootstrap Admin Dashboard Template</title>
+		<title>{% block title %}{%endblock title%}</title>
 		<link rel="stylesheet" href="{% static 'Index_App/vendors/mdi/css/materialdesignicons.min.css' %}">
 		<link rel="stylesheet" href="{% static 'Index_App/vendors/owl.carousel/css/owl.carousel.css' %}">
 		<link rel="stylesheet" href="{% static 'Index_App/vendors/owl.carousel/css/owl.theme.default.min.css' %}">
 		<link rel="stylesheet" href="{% static 'Index_App/vendors/aos/css/aos.css' %}">
 		<link rel="stylesheet" href="{% static 'Index_App/vendors/jquery-flipster/css/jquery.flipster.css' %}">
 		<link rel="stylesheet" href="{% static 'Index_App/css/style.css' %}">
-		<link rel="shortcut icon" href="{% static 'Index_App/images/favicon.png' %}"/>
+		<link rel="shortcut icon" href="{% static 'Index_App/images/kpllogo.png' %}"/>
 	</head>
 	<body data-spy="scroll" data-target=".navbar" data-offset="50">
 		<div id="mobile-menu-overlay"></div>
 		<nav class="navbar navbar-expand-lg fixed-top">
 			<div class="container">
-				<a class="navbar-brand" href="#"><img src="{% static 'Index_App/images/logo.svg' %}" alt="Marshmallow"></a>
+				<a class="navbar-brand" href="/"><img src="{% static 'Index_App/images/kpllogo.png' %}" style="height: 50px; width:50px;"></a>
 				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"><i class="mdi mdi-menu"> </i></span>
 				</button>
 				<div class="collapse navbar-collapse" id="navbarTogglerDemo01">
 					<div class="d-lg-none d-flex justify-content-between px-4 py-3 align-items-center">
-						<img src="{% static 'Index_App/images/logo-dark.svg' %}" class="logo-mobile-menu" alt="logo">
+						<h4 class="text-primary">KPL</h4>
 						<a href="javascript:;" class="close-menu"><i class="mdi mdi-close"></i></a>
 					</div>
 
@@ -68,7 +68,7 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-sm-6">
-							<img src="{% static 'Index_App/images/logo.svg' %}" alt="Marshmallow"></a>
+							<a class="navbar-brand text-white" href="/"><img src="{% static 'Index_App/images/kpllogo.png' %}" style="height: 50px; width:50px;"></a>
 							<address>
 								<p>kansar Premier League</p>
 								<div class="d-flex align-items-center">
@@ -117,7 +117,6 @@
 				<div class="container">
 					<div class="d-flex justify-content-between align-items-center">
 						<div class="d-flex align-items-center">
-							<img src="{% static 'Index_App/images/logo.svg' %}" alt="logo" class="mr-3">
 							<p class="mb-0 text-small pt-1">© 2021-2022 <a href="https://www.bootstrapdash.com" class="text-white" target="_blank">KPL</a>. All rights reserved.</p>
 						</div>
 						<div>

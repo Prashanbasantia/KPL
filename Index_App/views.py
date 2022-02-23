@@ -45,7 +45,6 @@ def login(request):
 
 def home(request):
     schedule = Schedule.objects.filter(schedule_date__date = datetime.now().date()).first()
-    print("schelude",schedule)
     matchinfo = MatchInfo.objects.get(schedule = schedule.id)
     context={
         "schedule":schedule,"matchinfo":matchinfo
@@ -60,7 +59,12 @@ def players(request):
 def review(request):
     return render(request,'Index_App/review.html')
 def schedule(request):
-    return render(request,'Index_App/schedule.html')
+    teams = Teams.objects.all().order_by('name')
+    all_schedules = Schedule.objects.all().order_by('schedule_date')
+    context={
+        "all_teams":teams,"all_schedules":all_schedules
+    }
+    return render(request,'Index_App/schedule.html',context)
 def point_table(request):
     point_table = PointTable.objects.all().order_by('point')
     context={
@@ -91,6 +95,51 @@ def user_livematch(request):
 
     bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
     player_bowl = Players.objects.filter(id__in=bowler.values('player'))
+
+    score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
+    bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
+
+    playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
+    playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
+
+    squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player'))
+    squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player'))
+    data={
+    "message":"success",
+    "status":True,
+    "players":PlayerImageSerializer(player,many=True).data,
+    "score":BatScoreSerializer(score,many=True).data,
+
+    "player_bowl":PlayerImageSerializer(player_bowl,many=True).data,
+    "bowl_score":BowlScoreSerializer(bowl_score,many=True).data,
+
+    "squardA":PlayerSquardScoreSerializer(squardA,many=True).data,
+    "squardB":PlayerSquardScoreSerializer(squardB,many=True).data,
+    "matchinfo":MatchinfoSerializer(match_info).data
+    }
+    return Response(data,status=status.HTTP_200_OK)
+
+
+def match_live(request):
+    schedule = Schedule.objects.filter(schedule_date__date = datetime.now().date()).first()
+    matchinfo = MatchInfo.objects.get(schedule = schedule.id)
+    context={
+        "schedule":schedule,"matchinfo":matchinfo
+    }
+    return render(request,'Index_App/match_live.html',context)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated],)
+def ajax_live_match(request):
+    match_info_id = request.GET.get('match_info')
+    match_info = MatchInfo.objects.get(id = match_info_id)
+
+    batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
+    player = Players.objects.filter(id__in=batter.values('player'))
+
+    bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+    player_bowl = Players.objects.filter(id__in=bowler.values('player'))
+
 
     score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
     bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
