@@ -32,7 +32,8 @@ class Players(models.Model):
     bowling_style=models.CharField(default="Right-arm Fast-medium",choices=bowling_style_choice,max_length=100)
     #stats
     match=models.IntegerField(default=0)
-    ins=models.IntegerField(default=0)
+    bat_ins=models.IntegerField(default=0)
+    bowl_ins=models.IntegerField(default=0)
 
     bat_runs=models.IntegerField(default=0)
     bat_balls=models.IntegerField(default=0)
@@ -106,8 +107,8 @@ class PlayerScore(models.Model):
     id = models.AutoField(primary_key=True)
     matchinfo = models.ForeignKey(MatchInfo,on_delete=models.CASCADE)
     player = models.ForeignKey(Players,on_delete=models.CASCADE)
-    bowling_choice=[("Not Bowling","Nbw"),("Bowling","Bw"),("Recent","Bw")]
-    batting_choice=[("Not Batting","Nbt"),("Batting","Bt"),("Out","ot"),("Not Out","not")]
+    bowling_choice=[("Not Bowling","Nbw"),("Bowling","Bw"),("Recent","Bw"),("Bowled","Bwl"),("Continue Bowl","cbl")]
+    batting_choice=[("Not Batting","Nbt"),("Batting","Bt"),("Out","ot"),("Continue Bat","cbl")]
 
     bat_status=models.CharField(default="Not Batting",choices=batting_choice,max_length=100)
     bat_is_striker = models.BooleanField(default=False)

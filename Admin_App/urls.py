@@ -38,4 +38,8 @@ urlpatterns = [
     path('ajax_update_live_wd_runs', views.ajax_update_live_wd_runs, name="ajax_update_live_wd_runs"),
     path('fetch_wicket_player', views.fetch_wicket_player, name="fetch_wicket_player"),
     path('ajax_update_player_wicket', views.ajax_update_player_wicket, name="ajax_update_player_wicket"),
+    path('ajax_update_noball', views.ajax_update_noball, name="ajax_update_noball"),
+    path('ajax_complete_first_inn', views.ajax_complete_first_inn, name="ajax_complete_first_inn"),
+    path('ajax_complete_second_inn', views.ajax_complete_second_inn, name="ajax_complete_second_inn"),
+    path('complete_task_schedules', views.complete_task_schedules, name="complete_task_schedules"),
 ]

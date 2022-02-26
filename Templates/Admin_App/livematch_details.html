@@ -35,11 +35,15 @@
 
       <!-- bowl -->
       <div class="col-lg-6">
-        <div class="tile playing_squard">
+        <div class="tile short_details">
 
         </div>
       </div>
       <!-- endbowl -->
+    </div>
+
+    <div class="playing_squard">
+
     </div>
     
 </main>
@@ -79,7 +83,7 @@
       $('#batone').empty()
       $('#batone').append(modal)
       var t2 = ""
-      t2 += '<div class="batone_head">'
+      t2 += '<div class="battwo_head">'
       t2 += '<h6 class="">Add Batsman  '
       t2 += '<button class="float-right btn btn-outline-info btn-sm" type="button" id="Add_batter_two"><i class="fa fa-plus" aria-hidden="true"></i></button></h6>'
       t2 += '</div>'
@@ -248,11 +252,18 @@
         modal += '</div>'
 
         modal += '<div class="mt-4">'
-          modal += '<div class="animated-checkbox ml-2 mt-2">'
+          modal += '<div class="animated-radio-button ml-2 mt-2">'
             modal += '<label>'
-              modal += '<input type="checkbox" name="is_leg_bye" value="True"><span class="label-text">Is Leg bye </span>'
+              modal += '<input type="radio" name="is_leg_bye" checked value="Lbye"><span class="label-text">Is only bye </span>'
             modal += '</label>'
           modal += '</div>'
+
+          modal += '<div class="animated-radio-button ml-2">'
+            modal += '<label>'
+              modal += '<input type="radio" name="is_leg_bye" value="Wide"><span class="label-text">Is Wide & bye </span>'
+            modal += '</label>'
+          modal += '</div>'
+
           modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="1" id="extra1">E1</button> '
           modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="2" id="extra2">E2</button> '
           modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="3" id="extra3">E3</button> '
@@ -289,38 +300,317 @@
       $('#bowl').append(bowl)
 
     }
+    
+
+    if( ! matchinfo['first_ins_complete']){
+
+            
+            /// match short details 
+            var sc = "";
+            sc += '<div class="col-sm-12" id="match_short_card">'
+            sc += '<h5 class="text-primary">First Innings</h5>'
+            sc += '<div class="clearfix" ></div>'
+
+            sc += '<div style="display: flex;justify-content: space-between;">'
+
+                sc += '<div> '
+                sc += '<i class=""><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i><br>'
+                sc += '<i class="">CRR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i><br> <i class="">Extras<span class="ml-1">' + matchinfo["first_ins_extra_runs"] + ' (wd-'+matchinfo["first_ins_extra_wd"] +', nb-'+ matchinfo["first_ins_extra_nb"]+', b-'+matchinfo["first_ins_extra_bye"] +')</span></i> <br>'
+                sc += '</div>'
+
+                  sc += '<div>'
+
+                  if (matchinfo["first_ins_complete"]) {
+                    sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b> <strong> ' + matchinfo["second_ins_runs"] + ' / ' + matchinfo["second_ins_wkts"] + ' (' + matchinfo["second_ins_overs"] + ')</strong></i><br>'
+                    sc += '<i class="">CRR<span class="ml-1">' + matchinfo["second_ins_crr"] + '</span></i> <br> <i class="">Extras<span class="ml-1">' + matchinfo["second_ins_extra_runs"] + ' (wd-'+matchinfo["second_ins_extra_wd"] +', nb-'+ matchinfo["second_ins_extra_nb"]+', b-'+matchinfo["second_ins_extra_bye"] +')</span></i> <br>'
+                  } else {
+                    sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b></i></br>'
+                  }
+
+                  sc += '</div>'
+
+            sc += '</div>'
+
+            // batting squard 
+
+            sc += '<div class="row mt-2">'
+              sc += '<div class="col-sm-12"> '
+                sc += '<center><h6 class="text-primary mt-2">' + matchinfo["first_ins"]['name'] + ' Batters </h6></center>'
+                sc += '<table class="table table-sm table-bordered">'
+                  sc += '<thead>'
+                    sc += '<tr>'
+                      sc += '<th>Name</th>'
+                      sc += '<th>R</th>'
+                      sc += '<th>B</th>'
+                      sc += '<th>Sr</th>'
+                      sc += '<th>4s</th>'
+                      sc += '<th>6s</th>'
+                    sc += '</tr>'
+                  sc += '</thead>'
+                  sc += '<tbody>'
+                    squardA.forEach(function (item) {
+                      if(item["bat_status"] == "Batting" || item["bat_status"] == "Out" ){
+
+                        if(item["bat_status"] == "Batting" ){
+                        sc += '<tr class="text-success">'
+                          sc += '<td> '+item["player"]["name"]+' </td>'
+                          sc += '<td> '+item["bat_runs"]+' </td>'
+                          sc += '<td> '+item["bat_balls"]+' </td>'
+                          sc += '<td> '+item["bat_strike_rate"]+' </td>'
+                          sc += '<td> '+item["bat_fours"]+' </td>'
+                          sc += '<td> '+item["bat_sixes"]+' </td>'
+                        sc += '</tr>'
+                      }else{
+
+                        sc += '<tr class="text-danger">'
+                          sc += '<td> '+item["player"]["name"]+' </td>'
+                          sc += '<td> '+item["bat_runs"]+' </td>'
+                          sc += '<td> '+item["bat_balls"]+' </td>'
+                          sc += '<td> '+item["bat_strike_rate"]+' </td>'
+                          sc += '<td> '+item["bat_fours"]+' </td>'
+                          sc += '<td> '+item["bat_sixes"]+' </td>'
+                        sc += '</tr>'
+                      }
+
+
+                    }
+                  })
+                  sc += '</tbody>'
+                sc += '</table>'
+          
+              sc += '</div>'
+              sc += '</div>'
+
+              // bowlers 
+              sc += '<div class="row mt-2">'
+              sc += '<div class="col-sm-12">'
+                  sc += '<center><h6 class="text-primary mt-2">' + matchinfo["second_ins"]['name'] + ' Bowlers</h6></center>'
+                  sc += '<table class="table table-sm table-bordered">'
+                    sc += '<thead>'
+                      sc += '<tr>'
+                        sc += '<th>Players</th>'
+                        sc += '<th>Ov</th>'
+                        sc += '<th>Wc</th>'
+                        sc += '<th>Rc</th>'
+                        sc += '<th>Eco</th>'
+                      sc += '</tr>'
+                    sc += '</thead>'
+                    sc += '<tbody>'
+                      squardB.forEach(function (item) {
+                        if(item["bowl_status"] == "Bowling" || item["bowl_status"] == "Recent" || item["bowl_status"] == "Bowled" ){
+
+                          if(item["bowl_status"] == "Bowling"){
+                          sc += '<tr class="text-success">'
+                            sc += '<td> '+item["player"]["name"]+' </td>'
+                            sc += '<td> '+item["bowl_over"]+' </td>'
+                            sc += '<td> '+item["bowl_wicket"]+' </td>'
+                            sc += '<td> '+item["bowl_runs"]+' </td>'
+                            sc += '<td> '+item["bowl_economy"]+' </td>'
+                          sc += '</tr>'
+                          }
+                          else{
+                            sc += '<tr class="text-dark">'
+                              sc += '<td> '+item["player"]["name"]+' </td>'
+                              sc += '<td> '+item["bowl_over"]+' </td>'
+                              sc += '<td> '+item["bowl_wicket"]+' </td>'
+                              sc += '<td> '+item["bowl_runs"]+' </td>'
+                              sc += '<td> '+item["bowl_economy"]+' </td>'
+                            sc += '</tr>'
+                          }
+                        }
+                    })
+                    sc += '</tbody>'
+                  sc += '</table>'
+                sc += '</div>'
+              sc += '</div>'
+
+
+
+              sc += '</div>'
+
+            $('#match_short_card').remove()
+            $('.short_details').empty()
+            $('.short_details').append(sc)
+
+
+
+    //match short details end
+    }
+/// #######################################   END FIRST INS  
+    else{
+
+         /// match short details 
+         var sc = "";
+         sc += '<div class="col-sm-12" id="match_short_card">'
+         sc += '<h5 class="text-primary">Second Innings</h5>'
+         sc += '<div class="clearfix" ></div>'
+
+         sc += '<div style="display: flex;justify-content: space-between;">'
+
+             sc += '<div> '
+              sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b> <strong> ' + matchinfo["second_ins_runs"] + ' / ' + matchinfo["second_ins_wkts"] + ' (' + matchinfo["second_ins_overs"] + ')</strong></i><br>'
+              sc += '<i class="">CRR<span class="ml-1">' + matchinfo["second_ins_crr"] + '</span></i><br> <i class="">Extras<span class="ml-1">' + matchinfo["second_ins_extra_runs"] + ' (wd-'+matchinfo["second_ins_extra_wd"] +', nb-'+ matchinfo["second_ins_extra_nb"]+', b-'+matchinfo["second_ins_extra_bye"] +')</span></i> <br>'
+             sc += '</div>'
+
+            sc += '<div>'
+              sc += '<i class=""><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i><br>'
+              sc += '<i class="">CRR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i> <br> <i class="">Extras<span class="ml-1">' + matchinfo["first_ins_extra_runs"] + ' (wd-'+matchinfo["first_ins_extra_wd"] +', nb-'+ matchinfo["first_ins_extra_nb"]+', b-'+matchinfo["first_ins_extra_bye"] +')</span></i> <br>'
+            sc += '</div>'
+
+         sc += '</div>'
+
+         // batting squard 
+
+         sc += '<div class="row mt-2">'
+           sc += '<div class="col-sm-12"> '
+             sc += '<center><h6 class="text-primary mt-2">' + matchinfo["second_ins"]['name'] + ' Batters </h6></center>'
+             sc += '<table class="table table-sm table-bordered">'
+               sc += '<thead>'
+                 sc += '<tr>'
+                   sc += '<th>Name</th>'
+                   sc += '<th>R</th>'
+                   sc += '<th>B</th>'
+                   sc += '<th>Sr</th>'
+                   sc += '<th>4s</th>'
+                   sc += '<th>6s</th>'
+                 sc += '</tr>'
+               sc += '</thead>'
+               sc += '<tbody>'
+                 squardB.forEach(function (item) {
+                   if(item["bat_status"] == "Batting" || item["bat_status"] == "Out" ){
+
+                     if(item["bat_status"] == "Batting" ){
+                     sc += '<tr class="text-success">'
+                       sc += '<td> '+item["player"]["name"]+' </td>'
+                       sc += '<td> '+item["bat_runs"]+' </td>'
+                       sc += '<td> '+item["bat_balls"]+' </td>'
+                       sc += '<td> '+item["bat_strike_rate"]+' </td>'
+                       sc += '<td> '+item["bat_fours"]+' </td>'
+                       sc += '<td> '+item["bat_sixes"]+' </td>'
+                     sc += '</tr>'
+                   }else{
+
+                     sc += '<tr class="text-danger">'
+                       sc += '<td> '+item["player"]["name"]+' </td>'
+                       sc += '<td> '+item["bat_runs"]+' </td>'
+                       sc += '<td> '+item["bat_balls"]+' </td>'
+                       sc += '<td> '+item["bat_strike_rate"]+' </td>'
+                       sc += '<td> '+item["bat_fours"]+' </td>'
+                       sc += '<td> '+item["bat_sixes"]+' </td>'
+                     sc += '</tr>'
+                   }
+
+
+                 }
+               })
+               sc += '</tbody>'
+             sc += '</table>'
+       
+           sc += '</div>'
+           sc += '</div>'
+
+           // bowlers 
+           sc += '<div class="row mt-2">'
+           sc += '<div class="col-sm-12">'
+               sc += '<center><h6 class="text-primary mt-2">' + matchinfo["first_ins"]['name'] + ' Bowlers</h6></center>'
+               sc += '<table class="table table-sm table-bordered">'
+                 sc += '<thead>'
+                   sc += '<tr>'
+                     sc += '<th>Players</th>'
+                     sc += '<th>Ov</th>'
+                     sc += '<th>Wc</th>'
+                     sc += '<th>Rc</th>'
+                     sc += '<th>Eco</th>'
+                   sc += '</tr>'
+                 sc += '</thead>'
+                 sc += '<tbody>'
+                   squardA.forEach(function (item) {
+                     if(item["bowl_status"] == "Bowling" || item["bowl_status"] == "Recent" || item["bowl_status"] == "Bowled" ){
+
+                       if(item["bowl_status"] == "Bowling"){
+                       sc += '<tr class="text-success">'
+                         sc += '<td> '+item["player"]["name"]+' </td>'
+                         sc += '<td> '+item["bowl_over"]+' </td>'
+                         sc += '<td> '+item["bowl_wicket"]+' </td>'
+                         sc += '<td> '+item["bowl_runs"]+' </td>'
+                         sc += '<td> '+item["bowl_economy"]+' </td>'
+                       sc += '</tr>'
+                       }
+                       else{
+                         sc += '<tr class="text-dark">'
+                           sc += '<td> '+item["player"]["name"]+' </td>'
+                           sc += '<td> '+item["bowl_over"]+' </td>'
+                           sc += '<td> '+item["bowl_wicket"]+' </td>'
+                           sc += '<td> '+item["bowl_runs"]+' </td>'
+                           sc += '<td> '+item["bowl_economy"]+' </td>'
+                         sc += '</tr>'
+                       }
+                     }
+                 })
+                 sc += '</tbody>'
+               sc += '</table>'
+             sc += '</div>'
+           sc += '</div>'
+
+
+
+           sc += '</div>'
+
+         $('#match_short_card').remove()
+         $('.short_details').empty()
+         $('.short_details').append(sc)
+    }
+
+    /// match info
+    
     // ####### Score Board
 
     var sc = "";
-    sc += '<div id="score_card">'
-    sc += '<h5 class="float-left">Score</h5><small class="float-right"><i><b>' + matchinfo["toss_own"] + '</b></i> Won The Toss And <i><b>' + matchinfo["toss_own_options"] + '</b></i></small>'
+    sc += '<div class="col-sm-12 tile" id="playing_squard_card">'
+    sc += '<h5 class="float-left">Match Info</h5><small class="float-right"><i><b>' + matchinfo["toss_own"] + '</b></i> Won The Toss And <i><b>' + matchinfo["toss_own_options"] + '</b></i></small>'
     sc += '<div class="clearfix" ></div>'
+
     sc += '<div style="display: flex;justify-content: space-between;">'
-    sc += '<div> '
-    sc += '<i class=""><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i><br>'
-    sc += '<i class="">CRR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i><br> <i class="">Extras<span class="ml-1">' + matchinfo["first_ins_extra_runs"] + ' (wd-'+matchinfo["first_ins_extra_wd"] +', nb-'+ matchinfo["first_ins_extra_nb"]+', b-'+matchinfo["first_ins_extra_bye"] +')</span></i> <br>'
-    sc += '</div>'
-    sc += '<div>'
-    if (matchinfo["first_ins_complete"]) {
-      sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b> <strong> ' + matchinfo["second_ins_runs"] + ' / ' + matchinfo["second_ins_wkts"] + ' (' + matchinfo["second_ins_overs"] + ')</strong></i><br>'
-      sc += '<i class="">CRR<span class="ml-1">' + matchinfo["second_ins_crr"] + '</span></i> <br> <i class="">Extras<span class="ml-1">' + matchinfo["second_ins_extra_runs"] + ' (wd-'+matchinfo["second_ins_extra_wd"] +', nb-'+ matchinfo["second_ins_extra_nb"]+', b-'+matchinfo["second_ins_extra_bye"] +')</span></i> <br>'
-    } else {
-      sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b></i></br>'
-    }
+
+        sc += '<div> '
+        sc += '<i class=""><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i><br>'
+        sc += '<i class="">CRR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i><br> <i class="">Extras<span class="ml-1">' + matchinfo["first_ins_extra_runs"] + ' (wd-'+matchinfo["first_ins_extra_wd"] +', nb-'+ matchinfo["first_ins_extra_nb"]+', b-'+matchinfo["first_ins_extra_bye"] +')</span></i> <br>'
+        sc += '</div>'
+
+          sc += '<div>'
+
+          if (matchinfo["first_ins_complete"]) {
+            sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b> <strong> ' + matchinfo["second_ins_runs"] + ' / ' + matchinfo["second_ins_wkts"] + ' (' + matchinfo["second_ins_overs"] + ')</strong></i><br>'
+            sc += '<i class="">CRR<span class="ml-1">' + matchinfo["second_ins_crr"] + '</span></i> <br> <i class="">Extras<span class="ml-1">' + matchinfo["second_ins_extra_runs"] + ' (wd-'+matchinfo["second_ins_extra_wd"] +', nb-'+ matchinfo["second_ins_extra_nb"]+', b-'+matchinfo["second_ins_extra_bye"] +')</span></i> <br>'
+          } else {
+            sc += '<i class=""><b>' + matchinfo["second_ins"]['name'] + '</b></i></br>'
+          }
+
+          sc += '</div>'
 
     sc += '</div>'
-    sc += '</div>'
+    
    
-    sc += '<div style="display: flex;flex-direction:column">'
-    sc += '<div> '
+    sc += '<div class="row mt-2">'
+    sc += '<div class="col-sm-6"> '
+    sc += '<div class="tile"> '
       sc += '<center><h6 class="text-primary mt-2">Playing Squard ' + matchinfo["first_ins"]['name'] + '</h6></center>'
       sc += '<table class="table table-sm table-bordered">'
         sc += '<thead>'
           sc += '<tr>'
-            sc += '<th>Player</th>'
+            sc += '<th>Players</th>'
+            sc += '<th colspan="5">Batting</th>'
+            sc += '<th colspan="5">Bowling</th>'
+            
+          sc += '</tr>'
+
+          sc += '<tr>'
+            sc += '<th>Name</th>'
             sc += '<th>R</th>'
             sc += '<th>B</th>'
             sc += '<th>Sr</th>'
+            sc += '<th>4s</th>'
+            sc += '<th>6s</th>'
             sc += '<th>Ov</th>'
             sc += '<th>Wc</th>'
             sc += '<th>Rc</th>'
@@ -334,6 +624,8 @@
             sc += '<td> '+item["bat_runs"]+' </td>'
             sc += '<td> '+item["bat_balls"]+' </td>'
             sc += '<td> '+item["bat_strike_rate"]+' </td>'
+            sc += '<td> '+item["bat_fours"]+' </td>'
+            sc += '<td> '+item["bat_sixes"]+' </td>'
             sc += '<td> '+item["bowl_over"]+' </td>'
             sc += '<td> '+item["bowl_wicket"]+' </td>'
             sc += '<td> '+item["bowl_runs"]+' </td>'
@@ -344,15 +636,27 @@
       sc += '</table>'
 
     sc += '</div>'
-    sc += '<div>'
+    sc += '</div>'
+
+    sc += '<div class="col-sm-6">'
+    sc += '<div class="tile">'
       sc += '<center><h6 class="text-primary mt-2">Playing Squard ' + matchinfo["second_ins"]['name'] + '</h6></center>'
       sc += '<table class="table table-sm table-bordered">'
         sc += '<thead>'
           sc += '<tr>'
-            sc += '<th>Player</th>'
+            sc += '<th>Players</th>'
+            sc += '<th colspan="5">Batting</th>'
+            sc += '<th colspan="5">Bowling</th>'
+            
+          sc += '</tr>'
+
+          sc += '<tr>'
+            sc += '<th>Name</th>'
             sc += '<th>R</th>'
             sc += '<th>B</th>'
             sc += '<th>Sr</th>'
+            sc += '<th>4s</th>'
+            sc += '<th>6s</th>'
             sc += '<th>Ov</th>'
             sc += '<th>Wc</th>'
             sc += '<th>Rc</th>'
@@ -366,6 +670,8 @@
             sc += '<td> '+item["bat_runs"]+' </td>'
             sc += '<td> '+item["bat_balls"]+' </td>'
             sc += '<td> '+item["bat_strike_rate"]+' </td>'
+            sc += '<td> '+item["bat_fours"]+' </td>'
+            sc += '<td> '+item["bat_sixes"]+' </td>'
             sc += '<td> '+item["bowl_over"]+' </td>'
             sc += '<td> '+item["bowl_wicket"]+' </td>'
             sc += '<td> '+item["bowl_runs"]+' </td>'
@@ -376,8 +682,18 @@
       sc += '</table>'
     sc += '</div>'
     sc += '</div>'
+
+    if(matchinfo['first_ins_complete']){
+      sc += '<center><button class="btn btn-outline-success" id="complete_second_innings" value = "Complete Second Inngings">Complete Second Inngings</button></center>'
+
+    }else{
+    sc += '<center><button class="btn btn-outline-success" id="complete_first_innings" value = "Complete First Inngings">Complete First Inngings</button></center>'
+    }
+
     sc += '</div>'
-    $('#score_card').remove()
+    sc += '</div>'
+
+    $('#playing_squard_card').remove()
     $('.playing_squard').empty()
     $('.playing_squard').append(sc)
   }
@@ -556,6 +872,7 @@
         cache: false,
         success: function (result) {
           if (result["status"]) {
+            location.reload();
             var player = result["players"]
             var score = result["score"]
             var modal = ""
@@ -610,6 +927,7 @@
         cache: false,
         success: function (result) {
           if (result["status"]) {
+            location.reload();
             var player = result["players"]
             var score = result["score"]
             var modal = ""
@@ -715,8 +1033,11 @@
       cache: false,
       success: function (result) {
         if (result["status"]) {
+          location.reload();
+
           var player = result["players"]
           var score = result["score"]
+          var over_details = result["over_details"]
           var modal = ""
           modal += '<div class="row" >'
             modal += '<div class="col-sm-6">'
@@ -735,44 +1056,8 @@
                 modal += '<span class="badge badge-secondary mr-2">Eco</span> ' + score["bowl_economy"] + ' <br>'
                 modal += '<span class="badge badge-primary mr-2">Runs</span> ' + score["bowl_runs"] + ' <br>'
                 modal += '</div>'
-    
-              modal += '</div>'
-            modal += '</div>'
-    
-          modal += '<div class="col-sm-6  p-2 mt-2 border border-primary">'
-    
-            modal += '<div class="">'
-              modal += '<button class="event_btn btn btn-outline-success btn-sm mt-2 ml-2" id="run0" value="0" >0</button> '
-              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" id="run1" value="1" >1</button>  '
-              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" id="run2" value="2" >2</button>  '
-              modal += '<button class="event_btn btn btn-outline-secondary btn-sm mt-2 ml-2" id="run3" value="3" >3</button>'
-              modal += '<button class="event_btn btn btn-outline-success btn-sm mt-2 ml-2" id="run4" value="4" >4</button>'
-              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" id="run6" value="6" >6</button> '
-            modal += '</div>'
-    
-            modal += '<div class="mt-4">'
-              modal += '<div class="animated-checkbox ml-2 mt-2">'
-                modal += '<label>'
-                  modal += '<input type="checkbox" name="is_leg_bye" value="True"><span class="label-text">Is Leg bye </span>'
-                modal += '</label>'
-              modal += '</div>'
-              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="1" id="extra1">E1</button> '
-              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="2" id="extra2">E2</button> '
-              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="3" id="extra3">E3</button> '
-              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="4" id="extra4">E4</button> '
-              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="5" id="extra5">E5</button> '
-              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="6" id="extra6">E6</button> '
-              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="7" id="extra7">E7</button> '
-            modal += '</div>'
-    
-            modal += '<div class="mt-4 mb-2">'
-              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wd" id="wide" >Wd</button> '
-              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="NB" id="noball" >NB</button> '
-              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wicket" id="wicket" >Wicket</button>'
-              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="--" id="reverserun" >--</button> '
-            modal += '</div>'
-    
-            //over details
+
+                //over details
 
             modal += '<div class="col-sm-12">'
               modal += '<div class="table-responsive">'
@@ -829,7 +1114,43 @@
               modal += '</div>'
             modal += '</div>'
                    //endbbowler details
-          modal += '</div>'
+    
+              modal += '</div>'
+            modal += '</div>'
+    
+          modal += '<div class="col-sm-6  p-2 mt-2 border border-primary">'
+    
+            modal += '<div class="">'
+              modal += '<button class="event_btn btn btn-outline-success btn-sm mt-2 ml-2" id="run0" value="0" >0</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" id="run1" value="1" >1</button>  '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" id="run2" value="2" >2</button>  '
+              modal += '<button class="event_btn btn btn-outline-secondary btn-sm mt-2 ml-2" id="run3" value="3" >3</button>'
+              modal += '<button class="event_btn btn btn-outline-success btn-sm mt-2 ml-2" id="run4" value="4" >4</button>'
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" id="run6" value="6" >6</button> '
+            modal += '</div>'
+    
+            modal += '<div class="mt-4">'
+              modal += '<div class="animated-checkbox ml-2 mt-2">'
+                modal += '<label>'
+                  modal += '<input type="checkbox" name="is_leg_bye" value="True"><span class="label-text">Is Leg bye </span>'
+                modal += '</label>'
+              modal += '</div>'
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="1" id="extra1">E1</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="2" id="extra2">E2</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="3" id="extra3">E3</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="4" id="extra4">E4</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="5" id="extra5">E5</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="6" id="extra6">E6</button> '
+              modal += '<button class="event_btn btn btn-outline-info btn-sm mt-2 ml-2" value="7" id="extra7">E7</button> '
+            modal += '</div>'
+    
+            modal += '<div class="mt-4 mb-2">'
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wd" id="wide" >Wd</button> '
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="NB" id="noball" >NB</button> '
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wicket" id="wicket" >Wicket</button>'
+              modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="--" id="reverserun" >--</button> '
+            modal += '</div>'
+        modal += '</div>'
         modal += '</div>'
 
           $(".bowl_head").remove()
@@ -892,13 +1213,6 @@
   $(document).on("click", "#extra1,#extra2,#extra3,#extra4,#extra5,#extra6,#extra7", function () {
     var val =  $(this).val()
     var is_leg_bye = $("input[name='is_leg_bye']:checked").val()
-    if (is_leg_bye == "True"){  
-      $("input[name='is_leg_bye']").prop('checked',false)
-    }
-    else{
-      is_leg_bye="False"
-    }
-    console.log(val,is_leg_bye)
     $(this).html('<i class="fa fa-spinner fa-spin" style="font-size:15px;"></i>');
     $('.event_btn').attr('disabled', true);
      $.ajax({
@@ -933,7 +1247,7 @@
    });
  
 // update wide an NB
-$(document).on("click", "#wide,#noball", function () {
+$(document).on("click", "#wide", function () {
   var val =  $(this).val()
   $(this).html('<i class="fa fa-spinner fa-spin" style="font-size:15px;"></i>');
   $('.event_btn').attr('disabled', true);
@@ -1249,6 +1563,348 @@ $(document).on("click", "#update_wicket_btn", function () {
 
 
 });
+
+
+$(document).on("click", "#noball", function () {
+
+  $.ajax({
+    url: "{% url 'fetch_wicket_player' %}",
+    type: "GET",
+    data: {
+      "match_info": "{{match_info.id}}"
+    },
+    cache: false,
+    success: function (result) {
+      if (result["status"]) {
+        var obj = result["objs"]
+        var modal = ""
+        modal += '<div class="modal" id="noballmodal" >'
+        modal += '<div class="modal-dialog" role="document">'
+        modal += ' <div class="modal-content">'
+        modal += '<div class="modal-header">'
+        modal += '<h5 class="modal-title">Update Noball</h5>'
+        modal += '<button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>'
+        modal += '</div>'
+        modal += '<form >'
+        modal += '<div class="modal-body">'
+
+       
+
+
+        modal += '<div class="mt-2  border border-success px-2">'
+          modal += '<p><strong>1.</strong> Choose Balls Run Type</p>'
+          modal += '<div class="animated-radio-button">'
+            modal += '<label>'
+            modal += '<input type="radio" name="noball_is_run" id="noball_is_run" checked value="True" ><span class="label-text">Is Run'
+            modal += '</label>'
+          modal += '</div>'
+
+          modal += '<div class="animated-radio-button">'
+            modal += '<label>'
+            modal += '<input type="radio" name="noball_is_run" id="wicket_is_run" value="False" ><span class="label-text">Is Extra Run'
+            modal += '</label>'
+          modal += '</div>'
+        modal += '</div>'
+        //hit run
+        modal += '<div class="mt-2  border border-primary px-2" id="hit_run">'
+          modal += '<p><strong>2.</strong> Choose Hit Run</p>'
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_hit_run" id="inlineRadio0" checked value="0">'
+            modal += '<label class="form-check-label" for="inlineRadio2">0</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_hit_run" id="inlineRadio1" value="1">'
+            modal += '<label class="form-check-label" for="inlineRadio1">1</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_hit_run" id="inlineRadio2" value="option2">'
+            modal += '<label class="form-check-label" for="inlineRadio2">2</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_hit_run" id="inlineRadio3" value="3">'
+            modal += '<label class="form-check-label" for="inlineRadio1">3</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_hit_run" id="inlineRadio4" value="4">'
+            modal += '<label class="form-check-label" for="inlineRadio2">4</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_hit_run" id="inlineRadio6" value="6">'
+            modal += '<label class="form-check-label" for="inlineRadio1">6</label>'
+          modal += '</div>'
+
+        modal += '</div>'
+
+        
+            // wicket extra run
+        modal += '<div class="mt-2 border border-primary px-2 d-none" id="extra_run">'
+          modal += '<p><strong>2.</strong> Choose Extra Run</p>'
+          modal += '<div class="animated-checkbox mt-2">'
+            modal += '<label>'
+              modal += '<input type="checkbox" name="noball_is_leg_bye" value="True"><span class="label-text">Is Leg bye </span>'
+            modal += '</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_extra_runs" id="inlineRadioe1" checked value="1">'
+            modal += '<label class="form-check-label" for="inlineRadio1">E1</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_extra_runs" id="inlineRadioe2" value="2">'
+            modal += '<label class="form-check-label" for="inlineRadio2">E2</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_extra_runs" id="inlineRadio1e3" value="3">'
+            modal += '<label class="form-check-label" for="inlineRadio1">E3</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_extra_runs" id="inlineRadioe4" value="4">'
+            modal += '<label class="form-check-label" for="inlineRadio2">E4</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_extra_runs" id="inlineRadioe5" value="5">'
+            modal += '<label class="form-check-label" for="inlineRadio2">E5</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_extra_runs" id="inlineRadioe6" value="6">'
+            modal += '<label class="form-check-label" for="inlineRadio2">E6</label>'
+          modal += '</div>'
+
+          modal += '<div class="form-check form-check-inline">'
+            modal += '<input class="form-check-input" type="radio" name="noball_extra_runs" id="inlineRadioe7" value="7">'
+            modal += '<label class="form-check-label" for="inlineRadio1">E7</label>'
+          modal += '</div>'
+        modal += '</div>'
+
+        modal += '<div class="mt-2  border border-success px-2">'
+          modal += '<p><strong>3.</strong> Choose Player</p>'
+
+          modal += '<div class="animated-checkbox mt-2">'
+            modal += '<label>'
+              modal += '<input type="checkbox" name="is_noball_out" value="True"><span class="label-text">Is Noball Out</span>'
+            modal += '</label>'
+          modal += '</div>'
+
+        obj.forEach(function (i) {
+          modal += '<div class="animated-radio-button">'
+          modal += '<label>'
+            if(i['bat_is_striker']){
+          modal += '<input type="radio" name="wicket_player_score_id" id="wicket_player_score_id" checked value="' + i["id"] + '" ><span class="label-text">' + i['player']["name"]+' <sup class="text-danger"><i class="fa fa-star"></i></sup></span>'
+            }else{
+          modal += '<input type="radio" name="wicket_player_score_id" id="wicket_player_score_id" value="' + i["id"] + '" ><span class="label-text">' + i['player']["name"] + '</span>'
+            }
+          modal += '</label>'
+          modal += '</div>'
+        });
+       
+
+        modal += '</div>'
+
+
+        modal += '</div>'
+        modal += '<div class="modal-footer">'
+        modal += '<button class="btn btn-success" type="button" id="update_noball_btn">Update</button>'
+        modal += '<button class="btn btn-secondary" type="button" data-dismiss="modal">Close</button>'
+        modal += '</div>'
+        modal += '</form>'
+        modal += '</div>'
+        modal += '</div>'
+        modal += '</div>'
+
+        $("#noballmodal").remove()
+        $('.app-content').append(modal)
+        $("#noballmodal").modal('show')
+
+      }
+      else {
+        console.log(result["message"])
+
+      }
+
+    }
+
+  });
+
+});
+
+//update noball btn 
+
+$(document).on("click", "input[name='noball_is_run']", function () {
+  var player_score_id = $("input[name='noball_is_run']:checked").val()
+  if (player_score_id == 'True') {
+    $('#extra_run').addClass('d-none')
+    $('#hit_run').removeClass('d-none')
+   
+  } else {
+
+    $('#extra_run').removeClass('d-none')
+    $('#hit_run').addClass('d-none')
+
+  }
+
+});
+
+
+$(document).on("click", "#update_noball_btn", function () {
+
+  var player_score_id = $("input[name='wicket_player_score_id']:checked").val()
+  var noball_is_run = $("input[name='noball_is_run']:checked").val()
+  var is_noball_out = $("input[name='is_noball_out']:checked").val()
+  if(is_noball_out != "True"){
+    is_noball_out = "False"
+
+  }
+
+  if (noball_is_run == 'True') {
+    var noball_hit_run = $("input[name='noball_hit_run']:checked").val()
+    console.log("first block")
+      $.ajax({
+        url: "{% url 'ajax_update_noball' %}",
+        type: "GET",
+        data: {
+          "match_info": "{{match_info.id}}", "player_score_id": player_score_id,'noball_is_run':noball_is_run,'noball_hit_run':noball_hit_run,"is_noball_out":is_noball_out
+        },
+        cache: false,
+        success: function (result) {
+          if (result["status"]) {
+            var player = result["players"]
+            var score = result["score"]
+            var player_bowl = result["player_bowl"]
+            var bowl_score = result["bowl_score"]
+            var squardA = result["squardA"]
+            var squardB = result["squardB"]
+            var matchinfo = result["matchinfo"]
+            var over_details = result["over_details"]
+            update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo,over_details)
+            $("#noballmodal").modal('hide')
+
+          }
+          else {
+            console.log(result["message"])
+          }
+
+        }
+
+      });
+
+  }
+   else {
+
+
+    var noball_is_leg_bye = $("input[name='noball_is_leg_bye']:checked").val()
+    if( noball_is_leg_bye != "True"){
+      noball_is_leg_bye = "False"
+    }
+    var noball_extra_runs = $("input[name='noball_extra_runs']:checked").val()
+   $.ajax({
+      url: "{% url 'ajax_update_noball' %}",
+      type: "GET",
+      data: {
+        "match_info": "{{match_info.id}}", "player_score_id": player_score_id,"noball_is_leg_bye":noball_is_leg_bye,"noball_extra_runs":noball_extra_runs,'noball_is_run':noball_is_run,"is_noball_out":is_noball_out
+      },
+      cache: false,
+      success: function (result) {
+        if (result["status"]) {
+          var player = result["players"]
+          var score = result["score"]
+          var player_bowl = result["player_bowl"]
+          var bowl_score = result["bowl_score"]
+          var squardA = result["squardA"]
+          var squardB = result["squardB"]
+          var matchinfo = result["matchinfo"]
+          var over_details = result["over_details"]
+          update_runs(player, score, player_bowl, bowl_score, squardA, squardB, matchinfo,over_details)
+          $("#noballmodal").modal('hide')
+
+
+        }
+        else {
+          console.log(result["message"])
+        }
+
+      }
+
+    });
+
+  }
+    
+
+
+});
+
+
+
+ 
+$(document).on("click", "#complete_first_innings", function () {
+  var val =  $(this).val()
+   $(this).html(val + ' <i class="fa fa-spinner fa-spin" style="font-size:15px;"></i>');
+   $(this).attr('disabled', true);
+  $.ajax({
+    url: "{% url 'ajax_complete_first_inn' %}",
+    type: "GET",
+    data: {
+      "match_info": "{{match_info.id}}"
+    },
+    cache: false,
+    success: function (result) {
+      if (result["status"]) {
+        $(this).html(val);
+          $(this).attr('disabled', false);
+        location.reload()
+      }
+      else {
+        console.log(result["message"])
+        location.reload()
+
+      }
+
+    }
+
+  });
+
+});
+
+ 
+$(document).on("click", "#complete_second_innings", function () {
+  var val =  $(this).val()
+   $(this).html(val + ' <i class="fa fa-spinner fa-spin" style="font-size:15px;"></i>');
+   $(this).attr('disabled', true);
+
+  $.ajax({
+    url: "{% url 'ajax_complete_second_inn' %}",
+    type: "GET",
+    data: {
+      "match_info": "{{match_info.id}}"
+    },
+    cache: false,
+    success: function (result) {
+      if (result["status"]) {
+        $(this).html(val);
+          $(this).attr('disabled', false);
+        location.reload()
+      }
+      else {
+        console.log(result["message"])
+        location.reload()
+
+      }
+
+    }
+
+  });
+
+});
+
 
 </script>
 {% endblock js %}

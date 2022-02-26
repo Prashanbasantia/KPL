@@ -79,7 +79,7 @@
                 {% elif s.schedule.status == "Live" %}
                 <a href="{% url 'livematch_details' id=s.id %}" class="btn btn-outline-danger">Live</a>
                 {% else %}
-                <a href="" class="btn btn-outline-success">Reviews</a>
+                <a href="{% url 'livematch_details' id=s.id %}" class="btn btn-outline-success">Reviews</a>
                 {%endif%}
               </td>
               <td>{{s.schedule.match_type}}</td>
