@@ -25,7 +25,6 @@
                   <th>Name</th>
                   <th>Team</th>
                   <th>Role</th>
-                  <th>Age</th>
                   <th>Village</th>
                 </tr>
               </thead>
@@ -36,7 +35,6 @@
                   <td><a href="{% url 'player_details' id=p.id %}">{{p.name}}</a></td>
                   <td><a href="{% url 'team_details' id=p.team.id %}">{{p.team.name}}</a></td>
                   <td>{{p.role}}</td>
-                  <td>{{p.age}}</td>
                   <td>{{p.address}}</td>
                 </tr>
                 {% endfor%}

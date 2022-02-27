@@ -20,11 +20,12 @@ from Index_App import views
 urlpatterns = [
     path('', views.home,name="home"),
     path('login/', views.login,name="login"),
-    path('review/', views.review,name="review"),
+    path('matches/', views.matches,name="matches"),
     path('schedule/', views.schedule,name="schedule"),
     path('points/', views.point_table,name="points"),
     path('players/', views.players,name="players"),
-    path('match_live/', views.match_live,name="match_live"),
+    path('live/', views.match_live,name="match_live"),
+    path('scorecard/', views.live_scorecard,name="live_scorecard"),
     path('fetch_user_livematch_home/', views.fetch_user_livematch_home,name="fetch_user_livematch_home"),
     path('ajax_live_match/', views.ajax_live_match,name="ajax_live_match"),
 ]

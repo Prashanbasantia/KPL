@@ -34,9 +34,9 @@
 							<a class="nav-link {% if request.path == home %}active{% endif %}" href="{{home}}">Home <span class="sr-only">(current)</span></a>
 						</li>
 						
-						{% url 'review' as review %}
+						{% url 'matches' as matches %}
 						<li class="nav-item ">
-							<a class="nav-link {% if request.path == review %}active{% endif %}" href="{{review}}">Review</a>
+							<a class="nav-link {% if request.path == matches %}active{% endif %}" href="{{matches}}">Matches</a>
 						</li>
 						{% url 'schedule' as schedule %}
 						<li class="nav-item ">
@@ -72,7 +72,7 @@
 							<address>
 								<p>kansar Premier League</p>
 								<div class="d-flex align-items-center">
-									<a href="mailto:info@yourmail.com" class="footer-link">info@yourmail.com</a>
+									<a href="mailto:kplkansar@gmail.com" class="footer-link">info@yourmail.com</a>
 								</div>
 							</address>
 							

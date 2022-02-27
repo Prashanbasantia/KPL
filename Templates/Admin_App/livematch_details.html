@@ -454,7 +454,7 @@
 
             sc += '<div>'
               sc += '<i class=""><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i><br>'
-              sc += '<i class="">CRR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i> <br> <i class="">Extras<span class="ml-1">' + matchinfo["first_ins_extra_runs"] + ' (wd-'+matchinfo["first_ins_extra_wd"] +', nb-'+ matchinfo["first_ins_extra_nb"]+', b-'+matchinfo["first_ins_extra_bye"] +')</span></i> <br>'
+              sc += '<i class="">RR<span class="ml-1">' + matchinfo["first_ins_crr"] + '</span></i> <br> <i class="">Extras<span class="ml-1">' + matchinfo["first_ins_extra_runs"] + ' (wd-'+matchinfo["first_ins_extra_wd"] +', nb-'+ matchinfo["first_ins_extra_nb"]+', b-'+matchinfo["first_ins_extra_bye"] +')</span></i> <br>'
             sc += '</div>'
 
          sc += '</div>'
@@ -619,18 +619,36 @@
         sc += '</thead>'
         sc += '<tbody>'
           squardA.forEach(function (item) {
-          sc += '<tr>'
-            sc += '<td> '+item["player"]["name"]+' </td>'
-            sc += '<td> '+item["bat_runs"]+' </td>'
-            sc += '<td> '+item["bat_balls"]+' </td>'
-            sc += '<td> '+item["bat_strike_rate"]+' </td>'
-            sc += '<td> '+item["bat_fours"]+' </td>'
-            sc += '<td> '+item["bat_sixes"]+' </td>'
-            sc += '<td> '+item["bowl_over"]+' </td>'
-            sc += '<td> '+item["bowl_wicket"]+' </td>'
-            sc += '<td> '+item["bowl_runs"]+' </td>'
-            sc += '<td> '+item["bowl_economy"]+' </td>'
-          sc += '</tr>'
+            sc += '<tr>'
+              sc += '<td> '+item["player"]["name"]+' </td>'
+              if( parseInt(item["bat_runs"]) > 0 || parseInt(item["bat_balls"]) > 0 ){
+              sc += '<td class="bg-success text-white"> '+item["bat_runs"]+' </td>'
+              sc += '<td class="bg-success text-white"> '+item["bat_balls"]+' </td>'
+              sc += '<td class="bg-success text-white"> '+item["bat_strike_rate"]+' </td>'
+              sc += '<td class="bg-success text-white"> '+item["bat_fours"]+' </td>'
+              sc += '<td class="bg-success text-white"> '+item["bat_sixes"]+' </td>'
+              }
+              else{
+              sc += '<td> '+item["bat_runs"]+' </td>'
+              sc += '<td> '+item["bat_balls"]+' </td>'
+              sc += '<td> '+item["bat_strike_rate"]+' </td>'
+              sc += '<td> '+item["bat_fours"]+' </td>'
+              sc += '<td> '+item["bat_sixes"]+' </td>'
+              }
+  
+              if(parseFloat(item["bowl_over"]) > 0){
+              sc += '<td class="bg-info text-white"> '+item["bowl_over"]+' </td>'
+              sc += '<td class="bg-info text-white"> '+item["bowl_wicket"]+' </td>'
+              sc += '<td class="bg-info text-white"> '+item["bowl_runs"]+' </td>'
+              sc += '<td class="bg-info text-white"> '+item["bowl_economy"]+' </td>'
+              }
+              else{
+              sc += '<td> '+item["bowl_over"]+' </td>'
+              sc += '<td> '+item["bowl_wicket"]+' </td>'
+              sc += '<td> '+item["bowl_runs"]+' </td>'
+              sc += '<td> '+item["bowl_economy"]+' </td>'
+              }
+            sc += '</tr>'
         })
         sc += '</tbody>'
       sc += '</table>'
@@ -667,15 +685,33 @@
           squardB.forEach(function (item) {
           sc += '<tr>'
             sc += '<td> '+item["player"]["name"]+' </td>'
+            if( parseInt(item["bat_runs"]) > 0 || parseInt(item["bat_balls"]) > 0 ){
+            sc += '<td class="bg-success text-white"> '+item["bat_runs"]+' </td>'
+            sc += '<td class="bg-success text-white"> '+item["bat_balls"]+' </td>'
+            sc += '<td class="bg-success text-white"> '+item["bat_strike_rate"]+' </td>'
+            sc += '<td class="bg-success text-white"> '+item["bat_fours"]+' </td>'
+            sc += '<td class="bg-success text-white"> '+item["bat_sixes"]+' </td>'
+            }
+            else{
             sc += '<td> '+item["bat_runs"]+' </td>'
             sc += '<td> '+item["bat_balls"]+' </td>'
             sc += '<td> '+item["bat_strike_rate"]+' </td>'
             sc += '<td> '+item["bat_fours"]+' </td>'
             sc += '<td> '+item["bat_sixes"]+' </td>'
+            }
+
+            if(parseFloat(item["bowl_over"]) > 0){
+            sc += '<td class="bg-info text-white"> '+item["bowl_over"]+' </td>'
+            sc += '<td class="bg-info text-white"> '+item["bowl_wicket"]+' </td>'
+            sc += '<td class="bg-info text-white"> '+item["bowl_runs"]+' </td>'
+            sc += '<td class="bg-info text-white"> '+item["bowl_economy"]+' </td>'
+            }
+            else{
             sc += '<td> '+item["bowl_over"]+' </td>'
             sc += '<td> '+item["bowl_wicket"]+' </td>'
             sc += '<td> '+item["bowl_runs"]+' </td>'
             sc += '<td> '+item["bowl_economy"]+' </td>'
+            }
           sc += '</tr>'
         })
         sc += '</tbody>'

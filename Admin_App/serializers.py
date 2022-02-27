@@ -1,3 +1,4 @@
+from numpy import place
 from rest_framework import serializers
 from Admin_App.models import *
 
@@ -28,18 +29,20 @@ class PlayerSquardScoreSerializer(serializers.ModelSerializer):
     player = PlayerSerializer()
     class Meta:
         model = PlayerScore
-        fields = ['player','bat_runs','bat_strike_rate','bat_fours','bat_sixes','bat_balls','bat_status','bowl_status' ,'bowl_over','bowl_wicket','bowl_runs','bowl_economy']
+        fields = ['player','bat_runs','bat_strike_rate','bat_is_striker','bat_fours','bat_sixes','bat_balls','bat_status','bowl_status' ,'bowl_over','bowl_wicket','bowl_runs','bowl_economy']
 
 
 class BowlScoreSerializer(serializers.ModelSerializer):
+    player = PlayerSerializer()
     class Meta:
         model = PlayerScore
-        fields = ['bowl_runs','bowl_over','bowl_economy','bowl_wicket']
+        fields = ['player','bowl_runs','bowl_over','bowl_economy','bowl_wicket','bowl_status']
 
 class BatScoreSerializer(serializers.ModelSerializer):
+    player = PlayerSerializer()
     class Meta:
         model = PlayerScore
-        fields = ['bat_is_striker','bat_runs','bat_balls','bat_strike_rate','bat_fours','bat_sixes']
+        fields = ['player','bat_is_striker','bat_runs','bat_balls','bat_strike_rate','bat_fours','bat_sixes','bat_status']
 
 
 class WicketPlayerSerializer(serializers.ModelSerializer):

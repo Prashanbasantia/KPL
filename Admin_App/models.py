@@ -107,8 +107,13 @@ class PlayerScore(models.Model):
     id = models.AutoField(primary_key=True)
     matchinfo = models.ForeignKey(MatchInfo,on_delete=models.CASCADE)
     player = models.ForeignKey(Players,on_delete=models.CASCADE)
-    bowling_choice=[("Not Bowling","Nbw"),("Bowling","Bw"),("Recent","Bw"),("Bowled","Bwl"),("Continue Bowl","cbl")]
+    bowling_choice=[("Not Bowling","Nbw"),("Bowling","Bw"),("Recent","Bw"),("Bowled","Bwl")]
     batting_choice=[("Not Batting","Nbt"),("Batting","Bt"),("Out","ot"),("Continue Bat","cbl")]
+
+    is_bat_inn_one = models.BooleanField(default=False)
+    is_bat_inn_two = models.BooleanField(default=False)
+    is_bowl_inn_one = models.BooleanField(default=False)
+    is_bowl_inn_two = models.BooleanField(default=False)
 
     bat_status=models.CharField(default="Not Batting",choices=batting_choice,max_length=100)
     bat_is_striker = models.BooleanField(default=False)
@@ -184,8 +189,6 @@ class FallWicket(models.Model):
     
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now_add=True)
-
-
 
 
 

@@ -27,7 +27,11 @@
 										</p>
 									</div>
 							</div>
+							{% if schedule_obj.status == "Live" %}
 							<a href="{% url 'match_live' %}" class="btn btn-danger mt-3">Live</a>
+							{% else %}
+							<a href="{% url 'match_live' %}" class="btn btn-success mt-3">Review</a>
+							{%endif %}
 						</div>
 						
 						<div class="mt-5 mt-lg-0">

@@ -242,7 +242,7 @@ def schedule_details(request,id):
             if not is_captain:
                 messages.error(request,"Please Select Catpain")
                 return HttpResponseRedirect(reverse('schedule_details',kwargs={"id":id}))
-            if len(player_id) != 11 :
+            if len(player_id) >= 11 :
                 messages.error(request,"Please Select 11 Players")
                 return HttpResponseRedirect(reverse('schedule_details',kwargs={"id":id}))
 
@@ -258,7 +258,7 @@ def schedule_details(request,id):
                     #play.ins= + 1 
                     play.save()
 
-                pl=PlayingSquard.objects.get(schedule = id ,player=Players.objects.get(id=is_captain))
+                pl=PlayingSquard.objects.get(schedule = id ,player=Players.objects.get(id=is_captain),is_play=True)
                 pl.is_captain = True
                 pl.save()
 
@@ -442,22 +442,37 @@ def loading_livematch(request):
     try:
         match_info_id = request.GET.get('match_info')
         match_info = MatchInfo.objects.get(id = match_info_id)
+        if not match_info.first_ins_complete:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_one = True)[:2]
+            player = Players.objects.filter(id__in=batter.values('player'))
 
-        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
-        player = Players.objects.filter(id__in=batter.values('player'))
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_one = True)[:1]
+            player_bowl = Players.objects.filter(id__in=bowler.values('player'))
 
-        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
-        player_bowl = Players.objects.filter(id__in=bowler.values('player'))
+            score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
+            bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
 
+            playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
+            playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
 
-        score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
-        bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
+            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
+            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
+        else:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_two = True)[:2]
+            player = Players.objects.filter(id__in=batter.values('player'))
 
-        playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
-        playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_two = True)[:1]
+            player_bowl = Players.objects.filter(id__in=bowler.values('player'))
 
-        squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player')).order_by('-updated_at')
-        squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player')).order_by('-updated_at')
+            score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player.values('id'))
+            bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
+
+            playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
+            playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
+
+            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
+            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
+
         if bowler:
             over_details = OverDetails.objects.filter(matchinfo = match_info_id,player = bowler[0].player.id).order_by('created_at')
             over_details_serializer = OverDetailsSerializer(over_details,many=True).data
@@ -569,7 +584,11 @@ def ajax_add_batter(request):
         match_info = MatchInfo.objects.get(id = match_info_id)
         with transaction.atomic():   
             bat_score = PlayerScore.objects.get(matchinfo = match_info.id,player = player_id)
-            bat_score.bat_status = "Batting"       
+            bat_score.bat_status = "Batting" 
+            if not  match_info.first_ins_complete:    
+                bat_score.is_bat_inn_one = True 
+            else:
+                bat_score.is_bat_inn_two = True     
             bat_score.updated_at = datetime.now()       
             if is_stricker == "True":
                 for i in PlayerScore.objects.filter(bat_is_striker=True,matchinfo = match_info.id,player__in = Players.objects.filter(team = player.team.id).values('id')):
@@ -603,7 +622,11 @@ def ajax_add_bowler(request):
         with transaction.atomic():
             bowl_score = PlayerScore.objects.get(matchinfo = match_info.id,player = player_id)
             bowl_score.bowl_status = "Bowling"       
-            bowl_score.updated_at = datetime.now()       
+            bowl_score.updated_at = datetime.now() 
+            if not  match_info.first_ins_complete:    
+                bowl_score.is_bowl_inn_one = True 
+            else:
+                bowl_score.is_bowl_inn_two = True        
             bowl_score.save()
             OverDetails.objects.create(matchinfo=match_info,player=player,over_status = True)
             data={
@@ -760,8 +783,8 @@ def ajax_update_live_runs(request):
             bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
             playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
             playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
-            squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player')).order_by('-updated_at')
-            squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player')).order_by('-updated_at')
+            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
+            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
             data={
             "message":"success",
             "status":True,
@@ -940,8 +963,8 @@ def ajax_update_live_extra_runs(request):
             bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
             playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
             playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
-            squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player')).order_by('-updated_at')
-            squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player')).order_by('-updated_at')
+            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
+            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
 
             data={
             "message":"success",
@@ -1032,8 +1055,8 @@ def ajax_update_live_wd_runs(request):
             bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
             playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
             playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
-            squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player')).order_by('-updated_at')
-            squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player')).order_by('-updated_at')
+            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
+            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
 
             data={
             "message":"success",
@@ -1408,8 +1431,8 @@ def ajax_update_player_wicket(request):
             bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
             playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
             playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
-            squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player')).order_by('-updated_at')
-            squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player')).order_by('-updated_at')
+            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
+            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
             data={
             "message":"success",
             "status":True,
@@ -1614,8 +1637,8 @@ def ajax_update_noball(request):
             bowl_score = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = player_bowl.values('id'))
             playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
             playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
-            squardA = PlayerScore.objects.filter(player__in = playingsquardA.values('player')).order_by('-updated_at')
-            squardB = PlayerScore.objects.filter(player__in = playingsquardB.values('player')).order_by('-updated_at')
+            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
+            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
             data={
             "message":"success",
             "status":True,
@@ -1671,9 +1694,8 @@ def ajax_complete_first_inn(request):
                 av  = (pl.bat_runs + i.bat_runs) / (pl.bat_ins+1)
                 pl.bat_average = av
                 pl.bat_strike_rate = (pl.bat_strike_rate + i.bat_strike_rate) / (pl.bat_ins+1)
+                pl.bat_ins = pl.bat_ins+1
                 pl.save()
-                i.bat_status = "Continue Bat"
-                i.save()
 
             scb = PlayerScore.objects.filter(Q(matchinfo = match_info_id),Q(bowl_status ="Bowling")|Q(bowl_status ="Recent")|Q(bowl_status ="Bowled"))
             for i in scb:
@@ -1694,9 +1716,8 @@ def ajax_complete_first_inn(request):
                 av  = (pl.bowl_wicket + i.bowl_wicket) / (pl.bowl_ins+1)
                 pl.bowl_average = av
                 pl.bowl_economy = (pl.bowl_economy + i.bowl_economy) / (pl.bowl_ins+1)
+                pl.bowl_ins = pl.bowl_ins+1
                 pl.save()
-                i.bowl_status = "Continue Bowl"
-                i.save()
 
             match_info.first_ins_complete = True
             match_info.save()                
@@ -1744,9 +1765,8 @@ def ajax_complete_second_inn(request):
                 av  = (pl.bat_runs + i.bat_runs) / (pl.bat_ins+1)
                 pl.bat_average = av
                 pl.bat_strike_rate = (pl.bat_strike_rate + i.bat_strike_rate) / (pl.bat_ins+1)
+                pl.bat_ins= pl.bat_ins +1
                 pl.save()
-                i.bat_status = "Continue Bat"
-                i.save()
 
             scb = PlayerScore.objects.filter(Q(matchinfo = match_info_id),Q(bowl_status ="Bowling")|Q(bowl_status ="Recent")|Q(bowl_status ="Bowled"))
             for i in scb:
@@ -1767,9 +1787,8 @@ def ajax_complete_second_inn(request):
                 av  = (pl.bowl_wicket + i.bowl_wicket) / (pl.bowl_ins+1)
                 pl.bowl_average = av
                 pl.bowl_economy = (pl.bowl_economy + i.bowl_economy) / (pl.bowl_ins+1)
+                pl.bowl_ins = pl.bowl_ins +1
                 pl.save()
-                i.bowl_status = "Continue Bowl"
-                i.save()
 
             match_info.seond_ins_complete = True
             if match_info.first_ins_runs > match_info.second_ins_runs:
