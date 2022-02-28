@@ -11,6 +11,7 @@
 					<div class="d-sm-flex justify-content-between">
 						<div data-aos="zoom-in-up">
 							<div class="d-flex justify-content-between">
+								{% if matchinfo %}
 									<div>
 										<img src="{{matchinfo.first_ins.logo.url}}" alt="marsmello" class=" img-thumbnail" width="150px" height="50px" data-aos="zoom-in-up">
 										<p class="">
@@ -26,11 +27,12 @@
 											{{matchinfo.second_ins.short_name}} <span id="teamtwo">{% if matchinfo.first_ins_complete%}{{matchinfo.second_ins_runs}}/{{matchinfo.second_ins_wkts}} ({{matchinfo.second_ins_overs}}) {%endif %}</span>
 										</p>
 									</div>
+									{% endif %}
 							</div>
 							{% if schedule_obj.status == "Live" %}
 							<a href="{% url 'match_live' %}" class="btn btn-danger mt-3">Live</a>
 							{% else %}
-							<a href="{% url 'match_live' %}" class="btn btn-success mt-3">Review</a>
+							<a href="{% url 'match_review' id=matchinfo.schedule.id %}" class="btn btn-success mt-3">Review</a>
 							{%endif %}
 						</div>
 						
@@ -42,31 +44,51 @@
 			</div>
 		</div>
 	</div>
-
-	<h3 class="ml-3 text-primary"> Top Batsman</h3>
+	{% if top_bowler.count > 0  %}
+	<h5 class="ml-3 text-primary"> Top Batters</h5>
 	<div class="mb-5" data-aos="fade-up">
-		<div class="owl-carousel-projects owl-carousel owl-theme" style="width: 100% important;">
-			<div class="item">
-				<img src="{%static 'Index_App/images/carousel/slider1.jpg' %}" alt="slider">
+		<div class="owl-carousel owl-theme" style="width: 100% important;">
+			{% for bt in top_batter %}
+			<div class="item" style="background-color: azure;">
+				<a href=""><img src="{{bt.image.url}}" alt="slider"></a>
+				<span style="position: fixed; color:rgb(54, 10, 212); left:20px; bottom:20px; background:white; padding:5px 10px; border-radius:15%;">#{{forloop.counter}}. <small class="text-success">{{bt.name}}</small></span>
 			</div>
-			<div class="item">
-				<img src="{%static 'Index_App/images/carousel/slider2.jpg' %}" alt="slider">
-			</div>
-			<div class="item">
-				<img src="{%static 'Index_App/images/carousel/slider3.jpg' %}" alt="slider">
-			</div>
-			<div class="item">
-				<img src="{%static 'Index_App/images/carousel/slider4.jpg' %}" alt="slider">
-			</div>
-			<div class="item">
-				<img src="{%static 'Index_App/images/carousel/slider5.jpg' %}" alt="slider">
-			</div>
-			<div class="item">
-				<img src="{%static 'Index_App/images/carousel/slider1.jpg' %}" alt="slider">
-			</div>
-			
+			{% endfor %}
+
 		</div>
 	</div>
+	
+	{% endif %}
+
+	{% if top_six_hitter.count > 0  %}
+	<h5 class="ml-3 text-primary"> Top Bowlers</h5>
+	<div class="mb-5" data-aos="fade-up">
+		<div class="owl-carousel owl-theme" style="width: 100% important;">
+			{% for bt in top_six_hitter %}
+			<div class="item" style="background-color: azure;">
+				<a href=""><img src="{{bt.image.url}}" alt="slider"></a>
+				<span style="position: fixed; color:rgb(54, 10, 212); left:20px; bottom:20px; background:white; padding:5px 10px; border-radius:15%;">#{{forloop.counter}}. <small class="text-success">{{bt.name}}</small></span>
+			</div>
+			{% endfor %}
+
+		</div>
+	</div>
+	{% endif %}
+
+	{% if top_batter.count > 0  %}
+	<h5 class="ml-3 text-primary"> Top Six Hitters</h5>
+	<div class="mb-5" data-aos="fade-up">
+		<div class="owl-carousel owl-theme" style="width: 100% important;">
+			{% for bt in top_bowler %}
+			<div class="item" style="background-color: azure;">
+				<a href=""><img src="{{bt.image.url}}" alt="slider"></a>
+				<span style="position: fixed; color:rgb(54, 10, 212); left:20px; bottom:20px; background:white; padding:5px 10px; border-radius:15%;">#{{forloop.counter}}. <small class="text-success">{{bt.name}}</small></span>
+			</div>
+			{% endfor %}
+
+		</div>
+	</div>
+	{% endif %}
 
 	
 </section>
@@ -74,6 +96,27 @@
 
 {% block js %}
 <script>
+	$('.owl-carousel').owlCarousel({
+		loop:true,
+		margin:10,
+		responsiveClass:true,
+		responsive:{
+			0:{
+				items:1,
+				nav:false
+			},
+			600:{
+				items:3,
+				nav:false
+			},
+			1000:{
+				items:5,
+				nav:false,
+				loop:false
+			}
+		}
+	})
+
 var BASEURL="http://127.0.0.1:8008"
 
   $(document).ready(function(){

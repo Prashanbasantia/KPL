@@ -21,6 +21,7 @@ urlpatterns = [
     path('teams/', views.view_teams, name="view_teams"),
     path('team/<str:id>', views.team_details, name="team_details"),
     path('players/', views.view_players, name="view_players"),
+    path('points_tables/', views.points_tables, name="points_tables"),
     path('player/<str:id>', views.player_details, name="player_details"),
     path('schedules/', views.view_schedules, name="view_schedules"),
     path('schedule/<str:id>', views.schedule_details, name="schedule_details"),
@@ -42,4 +43,5 @@ urlpatterns = [
     path('ajax_complete_first_inn', views.ajax_complete_first_inn, name="ajax_complete_first_inn"),
     path('ajax_complete_second_inn', views.ajax_complete_second_inn, name="ajax_complete_second_inn"),
     path('complete_task_schedules', views.complete_task_schedules, name="complete_task_schedules"),
+    path('reversestrike', views.reversestrike, name="reversestrike"),
 ]

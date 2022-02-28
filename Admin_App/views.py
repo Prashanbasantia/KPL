@@ -124,6 +124,12 @@ def view_players(request):
         }
     return render(request,'Admin_App/players.html',context)
 
+def points_tables(request):
+    point_table = PointTable.objects.all().order_by('-point','-run_rate')
+    context={
+        "point_table":point_table
+    }
+    return render(request,'Admin_App/point_table.html',context)
 
 def player_details(request,id):
     if request.method =="POST":
@@ -242,7 +248,7 @@ def schedule_details(request,id):
             if not is_captain:
                 messages.error(request,"Please Select Catpain")
                 return HttpResponseRedirect(reverse('schedule_details',kwargs={"id":id}))
-            if len(player_id) >= 11 :
+            if len(player_id) < 11 :
                 messages.error(request,"Please Select 11 Players")
                 return HttpResponseRedirect(reverse('schedule_details',kwargs={"id":id}))
 
@@ -582,7 +588,7 @@ def ajax_add_batter(request):
         match_info_id = request.GET.get('match_info')
         player = Players.objects.get(id=player_id)
         match_info = MatchInfo.objects.get(id = match_info_id)
-        with transaction.atomic():   
+        with transaction.atomic(): 
             bat_score = PlayerScore.objects.get(matchinfo = match_info.id,player = player_id)
             bat_score.bat_status = "Batting" 
             if not  match_info.first_ins_complete:    
@@ -671,9 +677,12 @@ def ajax_update_live_runs(request):
         match_info_id = request.GET.get('match_info')
         run = int(request.GET.get('run'))
         match_info = MatchInfo.objects.get(id = match_info_id)
-        
-        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
-        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+        if match_info.first_ins_complete:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_two = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_two=True)[:1]
+        else:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_one = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_one = True)[:1]
         with transaction.atomic():
             if batter[0].bat_is_striker:
                 stricker= batter[0]
@@ -758,12 +767,15 @@ def ajax_update_live_runs(request):
             elif od.ball_count == 6:
                 od.over_status = False
                 od.save()
-            
-            
             #check over end
             is_endball = int(str(float(bov)).split('.')[1])
             if is_endball == 0:
-                if run%2 == 0:
+                if run%2 != 0:
+                    stricker.bat_is_striker = True
+                    stricker.save()
+                    non_stricker.bat_is_striker = False
+                    non_stricker.save()
+                else:
                     stricker.bat_is_striker = False
                     stricker.save()
                     non_stricker.bat_is_striker = True
@@ -821,10 +833,13 @@ def ajax_update_live_extra_runs(request):
         match_info_id = request.GET.get('match_info')
         run = int(request.GET.get('run'))
         is_leg_bye = request.GET.get('is_leg_bye')
-        print("is leg bye",is_leg_bye)
         match_info = MatchInfo.objects.get(id = match_info_id)
-        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
-        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+        if match_info.first_ins_complete:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_two = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_two=True)[:1]
+        else:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_one = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_one = True)[:1]
         with transaction.atomic():
             if batter[0].bat_is_striker:
                 stricker= batter[0]
@@ -837,6 +852,7 @@ def ajax_update_live_extra_runs(request):
                 if  is_leg_bye == "Lbye":
                     ba = cal_ball(match_info.second_ins_overs)+1
                     ov = cal_over(ba)
+                    match_info.second_ins_runs = match_info.second_ins_runs+run
                     match_info.second_ins_extra_runs = match_info.second_ins_extra_runs+run
                     match_info.second_ins_extra_bye = match_info.second_ins_extra_bye+run
                     match_info.second_ins_overs = ov
@@ -846,6 +862,7 @@ def ajax_update_live_extra_runs(request):
                 else:
                     ba = cal_ball(match_info.second_ins_overs)
                     ov = cal_over(ba)
+                    match_info.second_ins_runs = match_info.second_ins_runs+run+1
                     match_info.second_ins_extra_runs = match_info.second_ins_extra_runs+run+1
                     match_info.second_ins_extra_bye = match_info.second_ins_extra_bye+run
                     match_info.second_ins_extra_wd = match_info.second_ins_extra_wd+1
@@ -867,7 +884,7 @@ def ajax_update_live_extra_runs(request):
                     ba = cal_ball(match_info.first_ins_overs)
                     ov = cal_over(ba)
                     match_info.first_ins_runs = match_info.first_ins_runs+run+1
-                    match_info.first_ins_extra_runs = match_info.first_ins_extra_runs+run
+                    match_info.first_ins_extra_runs = match_info.first_ins_extra_runs+run+1
                     match_info.first_ins_extra_wd = match_info.first_ins_extra_wd+1
                     match_info.first_ins_overs = ov
                     match_info.first_ins_crr = round((match_info.first_ins_runs+run+1)/ov,2)
@@ -926,7 +943,12 @@ def ajax_update_live_extra_runs(request):
                 #check over end
                 is_endball = int(str(float(bov)).split('.')[1])
                 if is_endball == 0:
-                    if run%2 == 0:
+                    if run%2 != 0:
+                        stricker.bat_is_striker = True
+                        stricker.save()
+                        non_stricker.bat_is_striker = False
+                        non_stricker.save()
+                    else:
                         stricker.bat_is_striker = False
                         stricker.save()
                         non_stricker.bat_is_striker = True
@@ -940,8 +962,8 @@ def ajax_update_live_extra_runs(request):
                         rec_bowl.bowl_status = "Not Bowling"
                         rec_bowl.save()
 
-            
             else :
+                print("wide abnd bye")
                 od.over_run_bye = od.over_run_bye+run
                 od.over_run_wd = od.over_run_wd+1
                 od.over_runs = od.over_runs+run+1
@@ -1004,8 +1026,12 @@ def ajax_update_live_wd_runs(request):
         is_wd = request.GET.get('wd')
         run = 1
         match_info = MatchInfo.objects.get(id = match_info_id)
-        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
-        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+        if match_info.first_ins_complete:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_two = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_two=True)[:1]
+        else:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_one = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_one = True)[:1]
         with transaction.atomic():
             if match_info.first_ins_complete:
                 ba = cal_ball(match_info.second_ins_overs)
@@ -1140,8 +1166,12 @@ def ajax_update_player_wicket(request):
 
 
         match_info = MatchInfo.objects.get(id = match_info_id)
-        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
-        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+        if match_info.first_ins_complete:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_two = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_two=True)[:1]
+        else:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_one = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_one = True)[:1]
 
         with transaction.atomic():
             if batter[0].bat_is_striker:
@@ -1390,7 +1420,12 @@ def ajax_update_player_wicket(request):
             #check over end
             is_endball = int(str(float(bov)).split('.')[1])
             if is_endball == 0:
-                if run%2 == 0:
+                if run%2 != 0:
+                    stricker.bat_is_striker = True
+                    stricker.save()
+                    non_stricker.bat_is_striker = False
+                    non_stricker.save()
+                else:
                     stricker.bat_is_striker = False
                     stricker.save()
                     non_stricker.bat_is_striker = True
@@ -1478,8 +1513,12 @@ def ajax_update_noball(request):
 
 
         match_info = MatchInfo.objects.get(id = match_info_id)
-        batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
-        bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling")[:1]
+        if match_info.first_ins_complete:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_two = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_two=True)[:1]
+        else:
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_one = True)[:2]
+            bowler  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_one = True)[:1]
 
         with transaction.atomic():
             if batter[0].bat_is_striker:
@@ -1678,7 +1717,7 @@ def ajax_complete_first_inn(request):
         match_info = MatchInfo.objects.get(id = match_info_id)
         
         with transaction.atomic():
-            sc = PlayerScore.objects.filter(Q(matchinfo = match_info_id),Q(bat_status ="Batting")|Q(bat_status ="Out"))
+            sc = PlayerScore.objects.filter(Q(is_bat_inn_one = True),Q(matchinfo = match_info_id),Q(bat_status ="Batting")|Q(bat_status ="Out"))
             for i in sc:
                 pl = Players.objects.get(id=i.player.id)
                 pl.bat_runs = pl.bat_runs +  i.bat_runs
@@ -1697,7 +1736,7 @@ def ajax_complete_first_inn(request):
                 pl.bat_ins = pl.bat_ins+1
                 pl.save()
 
-            scb = PlayerScore.objects.filter(Q(matchinfo = match_info_id),Q(bowl_status ="Bowling")|Q(bowl_status ="Recent")|Q(bowl_status ="Bowled"))
+            scb = PlayerScore.objects.filter(Q(is_bowl_inn_one = True),Q(matchinfo = match_info_id),Q(bowl_status ="Bowling")|Q(bowl_status ="Recent")|Q(bowl_status ="Bowled"))
             for i in scb:
                 pl = Players.objects.get(id=i.player.id)
                 pl.bowl_wicket = pl.bowl_wicket +  i.bowl_wicket
@@ -1749,7 +1788,7 @@ def ajax_complete_second_inn(request):
         match_info = MatchInfo.objects.get(id = match_info_id)
         
         with transaction.atomic():
-            sc = PlayerScore.objects.filter(Q(matchinfo = match_info_id),Q(bat_status ="Batting")|Q(bat_status ="Out"))
+            sc = PlayerScore.objects.filter(Q(is_bat_inn_two = True),Q(matchinfo = match_info_id),Q(bat_status ="Batting")|Q(bat_status ="Out"))
             for i in sc:
                 pl = Players.objects.get(id=i.player.id)
                 pl.bat_runs = pl.bat_runs +  i.bat_runs
@@ -1768,7 +1807,7 @@ def ajax_complete_second_inn(request):
                 pl.bat_ins= pl.bat_ins +1
                 pl.save()
 
-            scb = PlayerScore.objects.filter(Q(matchinfo = match_info_id),Q(bowl_status ="Bowling")|Q(bowl_status ="Recent")|Q(bowl_status ="Bowled"))
+            scb = PlayerScore.objects.filter(Q(is_bowl_inn_two = True),Q(matchinfo = match_info_id),Q(bowl_status ="Bowling")|Q(bowl_status ="Recent")|Q(bowl_status ="Bowled"))
             for i in scb:
                 pl = Players.objects.get(id=i.player.id)
                 pl.bowl_wicket = pl.bowl_wicket +  i.bowl_wicket
@@ -1863,4 +1902,58 @@ def complete_task_schedules(request):
         return HttpResponseRedirect(reverse('dashboard'))
 
 
-    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated],)
+def reversestrike(request):
+    try:
+        match_info_id = request.GET.get('match_info')
+        match_info = MatchInfo.objects.get(id = match_info_id)
+        with transaction.atomic():
+            batter  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting")[:2]
+            if batter[0].bat_is_striker:
+                print("one")
+                stricker= batter[0]
+                non_stricker = batter[1]
+
+                stricker.bat_is_striker = False
+                stricker.save()
+                non_stricker.bat_is_striker = True
+                non_stricker.save()
+            elif batter[1].bat_is_striker:
+                print(" two one")
+                stricker= batter[1]
+                non_stricker = batter[0]
+
+                stricker.bat_is_striker = False
+                stricker.save()
+
+                non_stricker.bat_is_striker = True
+                non_stricker.save()
+            else:
+                print("else")
+                stricker= batter[0]
+                non_stricker = batter[1]
+
+                stricker.bat_is_striker = True
+                stricker.save()
+                non_stricker.bat_is_striker = False
+                non_stricker.save()
+
+            data={
+                "message":"success",
+                "status":True
+                }      
+            return Response(data,status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
+        data={
+            "message":e,
+            "status":False,
+            }
+        return Response(data,status=status.HTTP_200_OK)

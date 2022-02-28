@@ -1,6 +1,6 @@
 {% extends 'Index_App/base.html' %}
 {% load static %}
-
+{% block title %}All Matches{%endblock title%}
 {% block main_content %}
 	
 <section id="home" class="home">
@@ -28,8 +28,8 @@
 								{% for s in match_info %}
 								<tr>
 								  <td>{{forloop.counter}}</td>
-								  <td><a href="">{{s.schedule.team_one.name}}</a></td>
-								  <td><a href="">{{s.schedule.team_two.name}}</a></td>
+								  <td><a href="{% url 'team_about' id=s.schedule.team_one.id %}">{{s.schedule.team_one.name}}</a></td>
+								  <td><a href="{% url 'team_about' id=s.schedule.team_two.id %}">{{s.schedule.team_two.name}}</a></td>
 								  <td>{{s.schedule.schedule_date}}</td>
 								  <td>{% if s.schedule.status == "Incomplete" %}
 									<button class="btn btn-outline-secondary btn-sm">Up-comming</button>
@@ -38,7 +38,7 @@
 									{% elif s.schedule.status == "Live" %}
 									<a href="{% url 'match_live'%}" class="btn btn-outline-danger btn-sm">Live</a>
 									{% else %}
-									<a href="{% url 'match_live'%}" class="btn btn-outline-success btn-sm">Reviews</a>
+									<a href="{% url 'match_review' id=s.schedule.id %}" class="btn btn-outline-success btn-sm">Reviews</a>
 									{%endif%}
 								  </td>
 								  <td>{{s.schedule.match_type}}</td>

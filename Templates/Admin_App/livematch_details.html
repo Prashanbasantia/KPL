@@ -277,7 +277,7 @@
           modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wd" id="wide" >Wd</button> '
           modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="NB" id="noball" >NB</button> '
           modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="Wicket" id="wicket" >Wicket</button>'
-          modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="--" id="reverserun" >--</button> '
+          modal += '<button class="event_btn btn btn-outline-danger btn-sm mt-2 ml-2" value="<->" id="reversestrike" ><-></button> '
         modal += '</div>'
 
       modal += '</div>'
@@ -1918,6 +1918,37 @@ $(document).on("click", "#complete_second_innings", function () {
 
   $.ajax({
     url: "{% url 'ajax_complete_second_inn' %}",
+    type: "GET",
+    data: {
+      "match_info": "{{match_info.id}}"
+    },
+    cache: false,
+    success: function (result) {
+      if (result["status"]) {
+        $(this).html(val);
+          $(this).attr('disabled', false);
+        location.reload()
+      }
+      else {
+        console.log(result["message"])
+        location.reload()
+
+      }
+
+    }
+
+  });
+  });
+
+
+  
+$(document).on("click", "#reversestrike", function () {
+  var val =  $(this).val()
+   $(this).html(val + ' <i class="fa fa-spinner fa-spin" style="font-size:15px;"></i>');
+   $(this).attr('disabled', true);
+
+  $.ajax({
+    url: "{% url 'reversestrike' %}",
     type: "GET",
     data: {
       "match_info": "{{match_info.id}}"

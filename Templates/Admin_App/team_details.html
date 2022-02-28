@@ -124,7 +124,6 @@
             <tr>
               <th>Image</th>
               <th>Name</th>
-              <th>Team</th>
               <th>Role</th>
               <th>Age</th>
               <th>Village</th>
@@ -134,8 +133,7 @@
             {% for p in all_players %}
             <tr>
               <td><img src="{{p.image.url}}" class="rounded-circle border-border-success" width="50px" height="50px" alt="{{p.name}}"> </td>
-              <td>{{p.name}}</td>
-              <td>{{p.team.name}}</td>
+              <td> <a href="{% url 'player_details' id=p.id %}">{{p.name}}</a></td>
               <td>{{p.role}}</td>
               <td>{{p.age}}</td>
               <td>{{p.address}}</td>

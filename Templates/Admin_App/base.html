@@ -54,13 +54,13 @@
      
       <li>
         {% url 'view_teams' as teams %}
-        <a class="app-menu__item {% if request.path == teams %}active{% endif %}" href="{{teams}}"><i class="app-menu__icon fas fa-users"></i>
+        <a class="app-menu__item {% if request.path == teams %}active{% endif %}" href="{{teams}}"><i class="app-menu__icon fas fa-list"></i>
           <span class="app-menu__label">Teams</span> </a>
       </li>
 
       <li>
         {% url 'view_players' as players %}
-        <a class="app-menu__item {% if request.path == players %}active{% endif %}" href="{{players}}"><i class="app-menu__icon fa fa-dashboard"></i>
+        <a class="app-menu__item {% if request.path == players %}active{% endif %}" href="{{players}}"><i class="app-menu__icon fa fa-users"></i>
           <span class="app-menu__label">Players</span> </a>
       </li>
       <li>
@@ -71,11 +71,12 @@
       
       <li>
         {% url 'view_schedules' as schedules %}
-        <a class="app-menu__item {% if request.path == schedules %}active{% endif %}" href="{{schedules}}"><i class="app-menu__icon fa fa-dashboard"></i>
+        <a class="app-menu__item {% if request.path == schedules %}active{% endif %}" href="{{schedules}}"><i class="app-menu__icon fa fa-calendar  "></i>
           <span class="app-menu__label">Schedule</span> </a>
       </li>
       <li>
-        <a class="app-menu__item" href="dashboard.html"><i class="app-menu__icon fa fa-dashboard"></i>
+        {% url 'points_tables' as points_tables %}
+        <a class="app-menu__item" href="{{points_tables}}"><i class="app-menu__icon fa fa-table" {% if request.path == points_tables %}active{% endif %}></i>
           <span class="app-menu__label">Point Table</span> </a>
       </li>
     </ul>

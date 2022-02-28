@@ -1,6 +1,6 @@
 {% extends 'Index_App/base.html' %}
 {% load static %}
-
+{% block title %}{{matchinfo.first_ins.name}} VS {{matchinfo.second_ins.name}} Scorecard{%endblock title%}
 {% block main_content %}
 	
 <section id="" class="">
@@ -32,9 +32,7 @@
 	function update_runs(batters,bowlers, squardA, squardB, matchinfo,over_details) {
 		
 		if( ! matchinfo['first_ins_complete']){
-	
-				
-				/// match short details 
+					/// match short details 
 				var sc = "";
 				sc += '<div class="col-sm-12" id="match_short_card">'
 				sc+='<small class="float-right"><i><b>' + matchinfo["toss_own"] + '</b></i> Won The Toss And <i><b>' + matchinfo["toss_own_options"] + '</b></i></small>'
@@ -177,7 +175,7 @@
 				 var sc = "";
 				 sc += '<div class="col-sm-12" id="match_short_card">'
 				 sc+='<small class="float-right"><i><b>' + matchinfo["toss_own"] + '</b></i> Won The Toss And <i><b>' + matchinfo["toss_own_options"] + '</b></i></small>'
-				 sc += '<h6 class="text-danger">Second Innings </h6>'
+				 sc += '<h6 class="text-danger"> <a href="/live/" class="mr-2">Live</a><br>Second Innings </h6>'
 				 sc += '<div class="clearfix" ></div>'
 	 
 				 sc += '<div style="display: flex;flex-direction:column;">'
@@ -187,6 +185,7 @@
 					 sc += '</div>'
 					 sc += '<div class="mt-2">'
 						sc += '<i class="text-primary"><b>' + matchinfo["second_ins"]['name'] + '</b> <strong> ' + matchinfo["second_ins_runs"] + ' / ' + matchinfo["second_ins_wkts"] + ' (' + matchinfo["second_ins_overs"] + ')</strong></i> <br>'
+						sc += '<i class="">CRR-<span class="ml-1">' + matchinfo["second_ins_crr"] + ', </span></i>  <i class="">Extras-<span class="">' + matchinfo["second_ins_extra_runs"] + ' (wd-'+matchinfo["second_ins_extra_wd"] +', nb-'+ matchinfo["second_ins_extra_nb"]+', b-'+matchinfo["second_ins_extra_bye"] +')</span></i> <br>'
 					 sc += '</div>'
 				 sc += '</div>'
 	 
@@ -195,7 +194,7 @@
  
 				 // batting squard 
 	 
-			 sc += '<div class=" mt-2 d-none" id="score_card_inn_two">'
+			 sc += '<div class=" mt-2">'
 				 sc += '<div class="row mt-2">'
 				   sc += '<div class="col-sm-12"> '
 					 sc += '<table class="table table-sm table-bordered">'
@@ -315,44 +314,41 @@
 	  }
 	
 	/// RUN END COUNTER
-	$(document).ready(function () {
-  setInterval(function(){
-	$.ajax({
-		url: "{% url 'ajax_live_match' %}",
-		type: "GET",
-		data: {
-		  "match_info": "{{matchinfo.id}}"
-		},
-		cache: false,
-		success: function (result) {
-		  if (result["status"]) {
-			var batters = result["batters"]
-			var bowlers = result["bowlers"]
-			var squardA = result["squardA"]
-			var squardB = result["squardB"]
-			var matchinfo = result["matchinfo"]
-			var over_details = result["over_details"]
-			update_runs(batters,bowlers, squardA, squardB, matchinfo,over_details)
-  
-		  }
-		  else {
-			console.log(result["message"])
-		  }
-  
-		}
-	  });
 
-  },500)
-	 
+
+	function uplive(){
+		$.ajax({
+			url: "{% url 'ajax_live_match' %}",
+			type: "GET",
+			data: {
+			  "match_info": "{{matchinfo.id}}"
+			},
+			cache: false,
+			success: function (result) {
+			  if (result["status"]) {
+				var batters = result["batters"]
+				var bowlers = result["bowlers"]
+				var squardA = result["squardA"]
+				var squardB = result["squardB"]
+				var matchinfo = result["matchinfo"]
+				var over_details = result["over_details"]
+				update_runs(batters,bowlers, squardA, squardB, matchinfo,over_details)
+	  
+			  }
+			  else {
+				console.log(result["message"])
+			  }
+	  
+			}
+		  });
+	}
+	$(document).ready(function () {
+		uplive()
   
 	});
   
-	$(document).on("click", "#score_card_inn_one_btn", function () {
-	
-		$('#score_card_inn_one_btn').removeClass('d-none')
-
-	})
-
-  
+	setInterval(function(){
+		uplive()
+	},5000)
   </script>
 {% endblock js %}

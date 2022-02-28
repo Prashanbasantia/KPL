@@ -1,15 +1,22 @@
-{% extends 'Index_App/base.html' %} {% load static %} 
+{% extends 'Admin_App/base.html' %} {% load static %} 
 {% block title %}Point Tables{%endblock title%}
 {% block main_content %}
-<section class="our-services" id="services">
-  <div class="container mb-3">
+<main class="app-content">
+	<div class="app-title">
+	  <div>
+		<ul class="app-breadcrumb breadcrumb">
+		  <li class="breadcrumb-item active"><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+		</ul>
+	  </div>
+	  <ul class="app-breadcrumb breadcrumb">
+	  </ul>
+	</div>
+
     <div class="row">
       <div class="col-md-12">
-        <div class="card" style="background-color: #f7f7f7;box-shadow: 1px 2px 3px 1px #b1abab;">
-			<div class="card-header">
-				<h6 class="card-title text-primary">Players</h6>
-			</div>
-		  <div class="card-body">
+        <div class="tile">
+				<h6 class="tile-title text-primary">Points Tables</h6>
+
         <table class="table table-hover table-bordered " id="sampleTable">
 				<thead>
 				  <tr>
@@ -35,14 +42,13 @@
 				  </tr>
 				  {% endfor %}
 				</tbody>
-			  </table>
-		  </div>
+		</table>
           
         </div>
       </div>
     </div>
-  </div>
-</section>
+
+ </main>	
 
 {% endblock main_content %}
 {% block js %}

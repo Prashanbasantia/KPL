@@ -1,4 +1,3 @@
-from numpy import place
 from rest_framework import serializers
 from Admin_App.models import *
 

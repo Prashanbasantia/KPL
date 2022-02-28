@@ -1,5 +1,6 @@
 {% extends 'Index_App/base.html' %}
 {% load static %}
+{% block title %}Live {{matchinfo.first_ins.name}} VS {{matchinfo.second_ins.name}} {%endblock title%}
 
 {% block main_content %}
 	
@@ -171,7 +172,7 @@
 	 
 				 sc += '<div style="display: flex;flex-direction:column;">'
 					 sc += '<div> '
-						 sc += '<a href=""><i class="text-primary"><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i> </a><br>'
+						 sc += '<a href="{% url "first_ins_scorecard" %}"><i class="text-primary"><b>' + matchinfo["first_ins"]['name'] + '</b> <strong> ' + matchinfo["first_ins_runs"] + ' / ' + matchinfo["first_ins_wkts"] + ' (' + matchinfo["first_ins_overs"] + ')</strong></i> </a><br>'
 					 sc += '</div>'
 					 sc += '<div class="mt-2">'
 						sc += '<i class="text-primary"><b>' + matchinfo["second_ins"]['name'] + '</b> <strong> ' + matchinfo["second_ins_runs"] + ' / ' + matchinfo["second_ins_wkts"] + ' (' + matchinfo["second_ins_overs"] + ')</strong></i> <br>'
@@ -269,7 +270,7 @@
 							 sc += '</table>'
 						   sc += '</div>'
 						 sc += '</div>'
-						 sc += '<i class="">CRR-<span class="ml-1">' + matchinfo["first_ins_crr"] + ', </span></i>  <i class="">Extras-<span class="">' + matchinfo["first_ins_extra_runs"] + ' (wd-'+matchinfo["first_ins_extra_wd"] +', nb-'+ matchinfo["first_ins_extra_nb"]+', b-'+matchinfo["first_ins_extra_bye"] +')</span></i> <br>'
+						 sc += '<i class="">CRR-<span class="ml-1">' + matchinfo["second_ins_crr"] + ', </span></i>  <i class="">Extras-<span class="">' + matchinfo["second_ins_extra_runs"] + ' (wd-'+matchinfo["second_ins_extra_wd"] +', nb-'+ matchinfo["second_ins_extra_nb"]+', b-'+matchinfo["second_ins_extra_bye"] +')</span></i> <br>'
 				   
 						 sc+= '<a href="{% url "live_scorecard" %}" class="btn btn-outline-primary mt-2" id="score_card_inn_one_btn">Scorecard</>'
 							sc += '</div>'	 
@@ -287,43 +288,40 @@
 	  }
 	
 	/// RUN END COUNTER
-	$(document).ready(function () {
-  setInterval(function(){
-	$.ajax({
-		url: "{% url 'ajax_live_match' %}",
-		type: "GET",
-		data: {
-		  "match_info": "{{matchinfo.id}}"
-		},
-		cache: false,
-		success: function (result) {
-		  if (result["status"]) {
-			var batters = result["batters"]
-			var bowlers = result["bowlers"]
-			var squardA = result["squardA"]
-			var squardB = result["squardB"]
-			var matchinfo = result["matchinfo"]
-			var over_details = result["over_details"]
-			update_runs(batters,bowlers, squardA, squardB, matchinfo,over_details)
-  
-		  }
-		  else {
-			console.log(result["message"])
-		  }
-  
-		}
-	  });
 
-  },500)
-	 
-  
+	function matlive(){
+		$.ajax({
+			url: "{% url 'ajax_live_match' %}",
+			type: "GET",
+			data: {
+			  "match_info": "{{matchinfo.id}}"
+			},
+			cache: false,
+			success: function (result) {
+			  if (result["status"]) {
+				var batters = result["batters"]
+				var bowlers = result["bowlers"]
+				var squardA = result["squardA"]
+				var squardB = result["squardB"]
+				var matchinfo = result["matchinfo"]
+				var over_details = result["over_details"]
+				update_runs(batters,bowlers, squardA, squardB, matchinfo,over_details)
+	  
+			  }
+			  else {
+				console.log(result["message"])
+			  }
+	  
+			}
+		  });
+	}
+	$(document).ready(function () {
+		matlive()
 	});
   
-	$(document).on("click", "#score_card_inn_one_btn", function () {
-	
-		$('#score_card_inn_one_btn').removeClass('d-none')
-
-	})
+	setInterval(function(){
+		matlive()
+	},500)
 
   
   </script>

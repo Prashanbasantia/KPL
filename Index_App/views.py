@@ -50,8 +50,11 @@ def home(request):
     if not schedule:
         schedule = Schedule.objects.filter(status = "Complete").order_by('-schedule_date').first()
     matchinfo = MatchInfo.objects.get(schedule = schedule.id)
+    top_batter = Players.objects.filter(bat_runs__gte = 1).order_by('-bat_runs')[:10]
+    top_bowler = Players.objects.filter(bowl_wicket__gte = 1).order_by('-bowl_wicket')[:10]
+    top_six_hitter = Players.objects.filter(bat_sixes__gte=1).order_by('-bat_sixes')[:10]
     context={
-        "schedule_obj":schedule,"matchinfo":matchinfo
+        "schedule_obj":schedule,"matchinfo":matchinfo,"top_batter":top_batter,"top_bowler":top_bowler,"top_six_hitter":top_six_hitter
     }
     return render(request,'Index_App/index.html',context)
 def players(request):
@@ -71,7 +74,7 @@ def schedule(request):
     }
     return render(request,'Index_App/schedule.html',context)
 def point_table(request):
-    point_table = PointTable.objects.all().order_by('point')
+    point_table = PointTable.objects.all().order_by('-point','-run_rate')
     context={
         "point_table":point_table
     }
@@ -106,6 +109,15 @@ def live_scorecard(request):
     }
     return render(request,'Index_App/live_score_card.html',context)
 
+
+def first_ins_scorecard(request):
+    schedule = Schedule.objects.filter(schedule_date__date = datetime.now().date()).first()
+    matchinfo = MatchInfo.objects.get(schedule = schedule.id)
+    context={
+        "schedule":schedule,"matchinfo":matchinfo
+    }
+    return render(request,'Index_App/first_ins_score_card.html',context)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated],)
 def ajax_live_match(request):
@@ -115,18 +127,14 @@ def ajax_live_match(request):
         if not match_info.first_ins_complete:
             batters  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_one = True)[:2]
             bowlers  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_one = True)[:1]
-            playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
-            playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
-
-            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
-            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
         else:
             batters  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_two = True)[:2]
             bowlers  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_two = True)[:1]
-            playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
-            playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
-            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
-            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
+
+        playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
+        playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
+        squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
+        squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
         data={
         "message":"success",
         "status":True,
@@ -152,3 +160,75 @@ def ajax_live_match(request):
             "status":False,
             }
         return Response(data,status=status.HTTP_200_OK)
+
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated],)
+def ajax_first_inn_score(request):
+    try:
+        match_info_id = request.GET.get('match_info')
+        match_info = MatchInfo.objects.get(id = match_info_id)
+        if match_info.first_ins_complete:
+            batters  = PlayerScore.objects.filter(matchinfo = match_info_id,bat_status ="Batting",is_bat_inn_one = True)[:2]
+            bowlers  = PlayerScore.objects.filter(matchinfo = match_info_id,bowl_status ="Bowling",is_bowl_inn_one = True)[:1]
+            playingsquardA = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in= Players.objects.filter(team=match_info.first_ins.id).values('id'))
+            playingsquardB = PlayingSquard.objects.filter(is_play = True,schedule = match_info.schedule.id,player__in=Players.objects.filter(team=match_info.second_ins.id).values('id'))
+            squardA = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardA.values('player')).order_by('-updated_at')
+            squardB = PlayerScore.objects.filter(matchinfo = match_info_id,player__in = playingsquardB.values('player')).order_by('-updated_at')
+            data={
+            "message":"success",
+            "status":True,
+            "batters":BatScoreSerializer(batters,many=True).data,
+            "bowlers":BowlScoreSerializer(bowlers,many=True).data,
+
+            "squardA":PlayerSquardScoreSerializer(squardA,many=True).data,
+            "squardB":PlayerSquardScoreSerializer(squardB,many=True).data,
+            "matchinfo":MatchinfoSerializer(match_info).data,
+            "over_details":[]
+            }
+            return Response(data,status=status.HTTP_200_OK)
+        else:
+            data={
+            "message":"false",
+            "status":False,
+            }
+            return Response(data,status=status.HTTP_200_OK) 
+    except Exception as e:
+        print(e)
+        exception_type, exception_object, exception_traceback = sys.exc_info()
+        filename = exception_traceback.tb_frame.f_code.co_filename
+        line_number = exception_traceback.tb_lineno
+        print("Exception type: ", exception_type)
+        print("File name: ", filename)
+        print("Line number: ", line_number)
+        data={
+            "message":e,
+            "status":False,
+            }
+        return Response(data,status=status.HTTP_200_OK)
+
+
+def player_about(request,id):
+    player = Players.objects.get(id=id)
+    context={
+        "player":player
+        }
+    return render(request,'Index_App/player_details.html',context)
+
+def team_about(request,id):
+    players = Players.objects.filter(team=id).order_by('name')
+    team = Teams.objects.get(id = id)
+    context={
+        "all_players":players,"team":team
+        }
+    return render(request,'Index_App/team_details.html',context)
+
+def match_review(request,id):
+    schedule = Schedule.objects.get(id= id)
+    matchinfo = MatchInfo.objects.get(schedule = schedule.id)
+    context={
+        "schedule":schedule,"matchinfo":matchinfo
+    }
+    return render(request,'Index_App/match_review.html',context)

@@ -1,4 +1,8 @@
-{% extends 'Index_App/base.html' %} {% load static %} {% block main_content %}
+{% extends 'Index_App/base.html' %} 
+{% load static %}
+{% block title %} View Players{%endblock title%}
+
+ {% block main_content %}
 <section class="our-services" id="services">
   <div class="container mb-3">
     <div class="row">
@@ -24,7 +28,7 @@
             {% for p in all_players %}
             <tr>
               <td><img src="{{p.image.url}}" class="rounded-circle border-border-success" width="30px" height="30px" alt="{{p.name}}"> </td>
-              <td><a href="{% url 'player_details' id=p.id %}">{{p.name}}</a></td>
+              <td><a href="{% url 'player_about' id=p.id %}">{{p.name}}</a></td>
               <td><a href="{% url 'team_details' id=p.team.id %}">{{p.team.name}}</a></td>
               <td>{{p.role}}</td>
               <td>{{p.age}}</td>
